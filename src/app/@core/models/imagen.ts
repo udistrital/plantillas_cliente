@@ -2,7 +2,7 @@
 export class Imagen {
     Id: number;
     Nombre: string;
-    Data: BinaryData;
+    Data: string;
     FechaCreacion: string;
     FechaModificacion: string;
     Activo: boolean;

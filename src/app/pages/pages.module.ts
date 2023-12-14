@@ -5,9 +5,8 @@ import { PagesRoutingModule } from './pages-routing.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { PagesComponent } from './pages.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestManager } from './services/requestManager';
 
-import {MatRadioModule} from '@angular/material/radio';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -17,22 +16,20 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatStepperModule } from '@angular/material/stepper';
-import { MAT_MOMENT_DATE_FORMATS, MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS,} from '@angular/material-moment-adapter';
-import { MatNativeDateModule, DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MAT_MOMENT_DATE_FORMATS, MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
+import { MatNativeDateModule, DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
-import { FormsModule, ReactiveFormsModule} from '@angular/forms';
-import { OasGridColsDirective } from './directives/oas-grid-cols.directive';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { Ng2SmartTableModule } from 'ng2-smart-table';
-import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
-import { UtilService } from './services/utilService';
-import { UserService } from './services/userService';
 import { InterceptorService } from '../loader/interceptor.service';
 import { MatDialogModule } from '@angular/material/dialog';
+import { CreacionPlantillaComponent } from './creacion-plantilla/creacion-plantilla.component';
+import { VistaPlantillasComponent } from './vista-plantillas/vista-plantillas.component';
+import { Ng2SmartTableModule } from 'ng2-smart-table';
 
 
 const pagesComponents = [
@@ -42,18 +39,18 @@ const pagesComponents = [
 
 const materialModules = [
   MatCardModule,
-  MatListModule,
+  // MatListModule,
   MatIconModule,
   MatInputModule,
   MatSelectModule,
   MatCheckboxModule,
-  MatDatepickerModule,
+  // MatDatepickerModule,
   MatNativeDateModule,
   MatFormFieldModule,
   MatGridListModule,
-  MatExpansionModule,
+  // MatExpansionModule,
   MatButtonModule,
-  MatStepperModule,
+  // MatStepperModule,
   MatRadioModule,
   MatProgressBarModule,
   MatProgressSpinnerModule
@@ -61,7 +58,8 @@ const materialModules = [
 @NgModule({
   declarations: [
     ...pagesComponents,
-    OasGridColsDirective,
+    VistaPlantillasComponent,
+    CreacionPlantillaComponent,
   ],
   imports: [
     HttpClientModule,
@@ -69,18 +67,16 @@ const materialModules = [
     FormsModule,
     ReactiveFormsModule,
     PagesRoutingModule,
-    Ng2SmartTableModule,
-    NgxExtendedPdfViewerModule,
     MatDialogModule,
+    Ng2SmartTableModule,
     ...materialModules,
   ],
   providers: [
-    RequestManager,
     MatDatepickerModule,
-    { provide:HTTP_INTERCEPTORS,useClass:InterceptorService,multi:true },
+    { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
     { provide: MAT_DATE_LOCALE, useValue: 'es-CO' },
     { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS] },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS}
+    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS }
   ]
 })
 export class PagesModule { }

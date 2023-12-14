@@ -1,0 +1,8 @@
+<p>creacion-plantilla works!</p>
+<input type="text" name="nombre" [(ngModel)]="nombre">
+<select name="tipoPlantilla" [(ngModel)]="tipo">
+    <option value="resolucion">Resolucion</option>
+    <option value="novedad">Novedad</option>
+    <option value="correo">Correo</option>
+</select>
+<button mat-raised-button class="send" (click)="calcular()">ERnvuar</button>

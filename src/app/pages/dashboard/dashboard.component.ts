@@ -20,9 +20,10 @@ export class DashboardComponent implements OnInit {
   }
 
   consultarRol(): void {
+    console.log("Eu");
     this.userService.user$.subscribe((data:any) => {
       if(data ? data.userService ? data.userService.documento ? true : false : false : false){
-
+        console.log("data", data);
         //UNIR ROLES
         this.roles = data.user.role;
         for(var i = 0; i<data.userService.role.length; i++){

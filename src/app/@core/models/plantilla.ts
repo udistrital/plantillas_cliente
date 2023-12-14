@@ -1,7 +1,7 @@
 import { Seccion } from "./seccion";
 import { Minuta } from "./minuta";
 import { Titulo } from "./titulo";
-import { Imagen } from "./Imagen";
+import { Imagen } from "./imagen";
 
 export class Plantilla {
   Id: number;
