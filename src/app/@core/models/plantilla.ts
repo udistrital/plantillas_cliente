@@ -1,19 +1,14 @@
 import { Seccion } from "./seccion";
-import { Minuta } from "./minuta";
-import { Titulo } from "./titulo";
-import { Imagen } from "./imagen";
 
 export class Plantilla {
   Id: number;
+  Tipo: string;
   Nombre: string;
   Descripcion: string;
-  Secciones: Seccion;
-  Minutas: Minuta;
-  Titulos: Titulo;
-  Imagenes: Imagen;
+  Secciones: Seccion[];
   EnlaceDoc: string;
   Version: number;
+  versionActual: boolean;
   FechaCreacion: string;
   FechaModificacion: string;
-  Activo: boolean;
 }

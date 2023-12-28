@@ -1,0 +1,72 @@
+<!-- <p>edicion-plantilla works!</p>
+<mat-card class="mat-card-margin">
+    <mat-card-title class="plantillas-title">
+        Generar plantillas
+    </mat-card-title>
+    <mat-card-content>
+        <form (submit)="generarPlantilla()">
+            <div class="form-row" style="border: 1px solid #000;"></div>
+            <br>
+            <div fxLayout="row">
+                <div fxFlex="70%">
+                    <div style="margin: 10px; width: 70%;">
+                        <mat-form-field>
+                            <mat-label>Nombre de la plantilla</mat-label>
+                            <input matInput [(ngModel)]="nombre">
+                        </mat-form-field>
+                    </div>
+                    <div style="margin: 10px;">
+                        <mat-form-field>
+                            <mat-label>Descripción</mat-label>
+                            <textarea matInput [(ngModel)]="descripcion" rows="2"></textarea>
+                        </mat-form-field>
+                    </div>
+                    <div style="margin: 10px;">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Enlace</mat-label>
+                            <input matInput type="text" name="enlace" [(ngModel)]="enlace"
+                                placeholder="Enlace de la plantilla">
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div fxFlex="30%">
+                    <div style="margin-bottom: 10px;">
+                        <mat-form-field>
+                            <mat-label>Nombre de la plantilla</mat-label>
+                            <input matInput>
+                        </mat-form-field>
+                    </div>
+
+                    <div style="margin-bottom: 10px;">
+                        <mat-form-field>
+                            <mat-label>Descripción</mat-label>
+                            <textarea matInput rows="2"></textarea>
+                        </mat-form-field>
+                    </div>
+
+                    <div style="margin-bottom: 10px;">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Enlace</mat-label>
+                            <input matInput placeholder="Enlace de la plantilla">
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div *ngFor="let seccion of secciones">
+                    <h2>{{ section.title }}</h2>
+                    <div *ngFor="let subsection of section.subsections">
+                        <h3>{{ subsection.title }}</h3>
+                        <p>{{ subsection.content }}</p>
+                        <input type="text" [(ngModel)]="subsection.content">
+                    </div>
+                </div>
+            </div>
+            <label>
+                <input type="checkbox" name="versionActual" [(ngModel)]="versionActual">
+                Versión Actual
+            </label>
+            <button mat-raised-button class="send" type="submit">Generar</button>
+        </form>
+    </mat-card-content>
+</mat-card> -->

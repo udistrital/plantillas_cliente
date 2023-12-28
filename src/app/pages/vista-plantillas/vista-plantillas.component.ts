@@ -4,6 +4,7 @@ import { RequestManager } from '../services/requestManager';
 import { UtilService } from '../services/utilService';
 import { UserService } from '../services/userService';
 import { TablaPlantilla } from 'app/@core/models/tablaPlantilla';
+import { environment } from 'environments/environment';
 
 
 @Component({
@@ -14,6 +15,7 @@ import { TablaPlantilla } from 'app/@core/models/tablaPlantilla';
 export class VistaPlantillasComponent implements OnInit {
 
   plantillasSettings: any;
+  ejecutado: boolean = false;
 
   dataPlantillas: LocalDataSource;
 
@@ -75,8 +77,18 @@ export class VistaPlantillasComponent implements OnInit {
     }
   }
 
-  consultarPlantillas(): void {
-    console.log(this.dataPlantillas);
+  consultarPlantillas(): any {
+    if (this.ejecutado === false) {
+      try {
+        this.request.get(environment.PLANTILLAS_MID_SERVICE, 'plantilla').subscribe((res) => {
+          this.dataPlantillas = new LocalDataSource(res.Data);
+          console.log(this.dataPlantillas);
+        });
+      } catch (error) {
+        console.error("Error: ", error);
+      }
+    }
+    this.ejecutado = true;
   }
 
   plantillaSeleccionada(event): void {

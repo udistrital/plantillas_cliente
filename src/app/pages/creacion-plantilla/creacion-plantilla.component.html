@@ -1,8 +1,82 @@
-<p>creacion-plantilla works!</p>
-<input type="text" name="nombre" [(ngModel)]="nombre">
-<select name="tipoPlantilla" [(ngModel)]="tipo">
-    <option value="resolucion">Resolucion</option>
-    <option value="novedad">Novedad</option>
-    <option value="correo">Correo</option>
-</select>
-<button mat-raised-button class="send" (click)="calcular()">ERnvuar</button>
+<mat-card class="mat-card-margin">
+    <mat-card-title class="plantillas-title">
+        Generar plantillas
+    </mat-card-title>
+    <mat-card-content>
+        <form (submit)="generarPlantilla()" [formGroup]="plantillaForm">
+            <div class="form-row" style="border: 1px solid #000;"></div>
+            <br>
+            <div class="row">
+                <div class="col1">
+                    <div style="margin: 10px;">
+                        <mat-form-field *ngIf="plantillaForm">
+                            <mat-label>Nombre de la plantilla</mat-label>
+                            <input matInput formControlName="nombre">
+                        </mat-form-field>
+                    </div>
+                    <div style="margin: 10px;">
+                        <mat-form-field *ngIf="plantillaForm">
+                            <mat-label>Descripción</mat-label>
+                            <textarea matInput rows="2" formControlName="descripcion"></textarea>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="col2">
+                    <div class="row">
+                        <div class="col1" style="margin: 20px;">
+                            <!-- <button style="height: 70%; width: 70%;" color="primary" (click)="agregarSeccion()">agregar
+                                Seccion</button> -->
+                            <button mat-mini-fab color="primary" (click)="agregarSeccion()" aria-label="agregarSeccion">
+                                <mat-icon>add</mat-icon>
+                            </button>
+                        </div>
+                        <div class="col2">
+                            <div formArrayName="secciones"
+                                *ngFor="let seccion of secciones.controls; let i = index">
+                                <div [formGroupName]="i">
+                                    <!-- <input class="campo" matInput type="text" placeholder="Ingrese el campo"
+                                        formControlName="Campo"> -->
+                                    <!-- <button (click)="eliminarSeccion(i)">Eliminar Sección</button> -->
+                                    <div class="row">
+                                        <div class="col2">
+                                            <div class="seccion-title">{{ seccion.Nombre }}</div>
+                                            <textarea matInput class="campo" id="campo" rows="2"
+                                                formControlName="Campo"></textarea>
+                                        </div>
+                                        <div class="col1">
+                                            <button mat-mini-fab color="warn" (click)="eliminarSeccion(i)"
+                                                aria-label="eliminarSeccion">
+                                                <mat-icon>clear</mat-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button mat-raised-button class="send" type="submit">Generar</button>
+        </form>
+    </mat-card-content>
+</mat-card>
+
+<div id="content" #content>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Plantilla1</td>
+                <td>ActaInicio</td>
+                <td>Esta es la plantilla de documento de acta de inicio de un contrato</td>
+            </tr>
+        </tbody>
+    </table>
+    <button (click)="crearPDF($event)">Generate PDF</button>
+</div>

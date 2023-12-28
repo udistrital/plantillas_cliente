@@ -1,12 +1,12 @@
 <mat-card class="card-oas">
-    <mat-card-title class="plantillas-title">
-        <h2>Vista de plantillas</h2>
+    <mat-card-title class="cumplidos-dve-title">
+        <h2>Vista de Plantillas</h2>
     </mat-card-title>
     <mat-card-content>
         <div class="table">
             <mat-card class="card-oas">
-                <mat-card-title class="plantillas-title">
-                    <h2>Plantillas</h2>
+                <mat-card-title class="cumplidos-dve-title">
+                    <h3>Lista de plantillas</h3>
                 </mat-card-title>
                 <mat-card-content>
                     <ng2-smart-table [settings]="plantillasSettings" [source]="dataPlantillas"
@@ -16,16 +16,3 @@
         </div>
     </mat-card-content>
 </mat-card>
-
-
-<ng-template #accionAprobar let-data>
-    <button mat-button type="button">
-        <i class="{{ this.data.name === 'Aprobar' ? 'fas fa-check' : 'fas fa-times' }}"></i>
-    </button>
-</ng-template>
-
-<ng-template #accionRechazar let-data>
-    <button mat-button type="button">
-        <i class="{{ this.data.name === 'Rechazar' ? 'fas fa-check' : 'fas fa-times' }}"></i>
-    </button>
-</ng-template>

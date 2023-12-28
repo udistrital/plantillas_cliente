@@ -1,41 +1,41 @@
 export const TablaPlantilla: any = {
-  Id: {
+  _id: {
     hide: true
   },
-  Nombre: {
+  nombre: {
     title: 'Nombre',
     width: '15%',
     editable: false,
     filter: true,
   },
-  Tipo: {
+  tipo: {
     title: 'Tipo',
     width: '10%',
     editable: false,
     filter: true,
   },
-  FechaCreacion: {
+  fechaCreacion: {
     title: 'FechaCreacion',
     width: '20%',
     editable: false,
     filter: true
   },
-  FechaModificacion: {
+  fechaModificacion: {
     title: 'FechaModificacion',
     width: '20%',
     editable: false,
     filter: true,
   },
-  Estado: {
+  versionActual: {
     title: 'Estado',
     width: '10%',
     editable: false,
     filter: true,
   },
-  Responsable: {
+  responsable: {
     title: 'Responsable',
     width: '10%',
     editable: false,
     filter: true,
   }
-}
+};

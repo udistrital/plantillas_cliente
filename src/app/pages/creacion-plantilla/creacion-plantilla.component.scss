@@ -1,0 +1,111 @@
+.plantillas-title {
+    text-align: center;
+}
+
+.container-name {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+}
+
+.mat-card-margin {
+    margin: 20px;
+    width: auto;
+}
+
+.table .card-oas {
+    width: 98%;
+}
+
+.form-time mat-form-field {
+    margin-left: 32px;
+    width: 30%;
+}
+
+.container {
+    display: flex;
+    margin-right: -5px;
+    margin-left: -5px;
+}
+
+.form-column {
+    flex: 0 0 50%;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+.table ng2-smart-table {
+    text-align: center;
+}
+
+.send {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    left: 47%;
+    color: white;
+    background-color: forestgreen;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.mat-input-element::placeholder {
+    padding-left: 10px;
+    text-align: center;
+}
+
+.row {
+    display: flex;
+}
+
+// .row div {
+//     flex: 1;
+// }
+
+.col1 {
+    background: blue($color: green);
+    width: 30%;
+}
+
+.col2 {
+    background: blue($color: white);
+    width: 70%;
+    border: solid 1px black;
+}
+
+.seccion {
+    margin: 20px;
+    position: relative;
+    color: white;
+    border: solid 1px black;
+}
+
+.section-title {
+    text-align: center;
+    font-size: medium;
+}
+
+.campo {
+    margin: 20px;
+    position: relative;
+    width: auto;
+    color: black;
+    border: solid 1px black;
+    border-radius: 5px;
+}
+
+td {
+    background-color: beige;
+    text-align: center;
+}
+
+#content {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    left: 47%;
+    color: white;
+    background-color: forestgreen;
+}

@@ -1,12 +1,11 @@
-import { CampoAdicional } from "./campoAdicional";
+import { Campo } from "./campo";
 import { EstiloFuente } from "./estiloFuente";
 
 export class Seccion {
-    Id: number;
+    Posicion: string;
     Nombre: string;
     Descripcion: string;
-    Valor: string;
-    CamposAdicionales: CampoAdicional;
+    Campos: Campo[];
     EstiloFuente: EstiloFuente;
     FechaCreacion: string;
     FechaModificacion: string;
