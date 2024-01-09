@@ -30,7 +30,6 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { CreacionPlantillaComponent } from './creacion-plantilla/creacion-plantilla.component';
 import { VistaPlantillasComponent } from './vista-plantillas/vista-plantillas.component';
 import { Ng2SmartTableModule } from 'ng2-smart-table';
-import { EdicionPlantillaComponent } from './edicion-plantilla/edicion-plantilla.component';
 
 
 const pagesComponents = [
@@ -61,7 +60,6 @@ const materialModules = [
     ...pagesComponents,
     VistaPlantillasComponent,
     CreacionPlantillaComponent,
-    EdicionPlantillaComponent,
   ],
   imports: [
     ...materialModules,

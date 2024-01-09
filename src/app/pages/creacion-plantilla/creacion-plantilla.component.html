@@ -6,44 +6,47 @@
         <form (submit)="generarPlantilla()" [formGroup]="plantillaForm">
             <div class="form-row" style="border: 1px solid #000;"></div>
             <br>
-            <div class="row">
-                <div class="col1">
-                    <div style="margin: 10px;">
+            <div class="panel row">
+                <div class="infoGeneral">
+                    <div style="margin: 20px;">
                         <mat-form-field *ngIf="plantillaForm">
                             <mat-label>Nombre de la plantilla</mat-label>
                             <input matInput formControlName="nombre">
                         </mat-form-field>
                     </div>
-                    <div style="margin: 10px;">
+                    <div style="margin: 20px;">
                         <mat-form-field *ngIf="plantillaForm">
-                            <mat-label>Descripción</mat-label>
-                            <textarea matInput rows="2" formControlName="descripcion"></textarea>
+                            <mat-label>Tipo de plantilla</mat-label>
+                            <select matNativeControl formControlName="tipo">
+                                <option *ngFor="let tipo of tiposPlantilla" [value]="tipoSeleccionado">{{ tipo.Nombre }}
+                                </option>
+                            </select>
                         </mat-form-field>
                     </div>
                 </div>
-                <div class="col2">
-                    <div class="row">
-                        <div class="col1" style="margin: 20px;">
+                <div class="panel plantillaForm">
+                    <div class="panel row">
+                        <div style="margin: 20px; width: 25%;">
                             <!-- <button style="height: 70%; width: 70%;" color="primary" (click)="agregarSeccion()">agregar
-                                Seccion</button> -->
-                            <button mat-mini-fab color="primary" (click)="agregarSeccion()" aria-label="agregarSeccion">
-                                <mat-icon>add</mat-icon>
+                                    Seccion</button> -->
+                            <button mat-button class="secButton" (click)="agregarSeccion()" aria-label="agregarSeccion">
+                                Agregar Sección
+                                <mat-icon>library_add</mat-icon>
                             </button>
                         </div>
-                        <div class="col2">
-                            <div formArrayName="secciones"
-                                *ngFor="let seccion of secciones.controls; let i = index">
+                        <div style="width: 75%;">
+                            <div formArrayName="secciones" *ngFor="let seccion of secciones.controls; let i = index">
                                 <div [formGroupName]="i">
                                     <!-- <input class="campo" matInput type="text" placeholder="Ingrese el campo"
-                                        formControlName="Campo"> -->
+                                            formControlName="Campo"> -->
                                     <!-- <button (click)="eliminarSeccion(i)">Eliminar Sección</button> -->
                                     <div class="row">
-                                        <div class="col2">
+                                        <div style="width: 80%;">
                                             <div class="seccion-title">{{ seccion.Nombre }}</div>
                                             <textarea matInput class="campo" id="campo" rows="2"
                                                 formControlName="Campo"></textarea>
                                         </div>
-                                        <div class="col1">
+                                        <div style="margin: 20px; width: auto; position: relative;">
                                             <button mat-mini-fab color="warn" (click)="eliminarSeccion(i)"
                                                 aria-label="eliminarSeccion">
                                                 <mat-icon>clear</mat-icon>
@@ -56,12 +59,14 @@
                     </div>
                 </div>
             </div>
-            <button mat-raised-button class="send" type="submit">Generar</button>
+            <div class="row">
+                <button mat-raised-button class="send" type="submit">Generar</button>
+            </div>
         </form>
     </mat-card-content>
 </mat-card>
 
-<div id="content" #content>
+<!-- <div id="content" #content>
     <table>
         <thead>
             <tr>
@@ -79,4 +84,4 @@
         </tbody>
     </table>
     <button (click)="crearPDF($event)">Generate PDF</button>
-</div>
+</div> -->

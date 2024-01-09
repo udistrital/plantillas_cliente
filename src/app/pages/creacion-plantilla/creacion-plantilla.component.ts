@@ -10,6 +10,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Seccion } from 'app/@core/models/seccion';
 import { Campo } from 'app/@core/models/campo';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 // import { ScrollingModule } from '@angular/cdk/scrolling';
 
 const pdf = new jsPDF();
@@ -22,6 +23,9 @@ const pdf = new jsPDF();
 export class CreacionPlantillaComponent implements OnInit {
 
   plantillaForm: FormGroup;
+  ejecutado: boolean = false;
+  tiposPlantilla = [];
+  tipoSeleccionado: string = '';
 
   @ViewChild('content', { static: false }) el!: ElementRef;
 
@@ -39,7 +43,8 @@ export class CreacionPlantillaComponent implements OnInit {
     private popUp: UtilService,
     private userService: UserService,
     private http: HttpClient,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
   ) {
     this.plantillaForm = this.fb.group({
       nombre: '',
@@ -63,6 +68,21 @@ export class CreacionPlantillaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this, this.tiposPlantilla = [
+      { id: 1, Nombre: 'Factura'},
+      { id: 2, Nombre: 'Contrato'},
+      { id: 3, Nombre: 'Acta de inicio'},
+      { id: 4, Nombre: 'Informe'},
+    ];
+
+    this.route.queryParams.subscribe(params => {
+      if (params['id']) {
+        this.llenarCampos(params['id']);
+      } else {
+        console.log("Creación de plantilla");
+      }
+    });
   }
 
   agregarSeccion() {
@@ -133,6 +153,56 @@ export class CreacionPlantillaComponent implements OnInit {
         pdf.save("test.pdf");
       }
     });
+  }
+
+  llenarCampos(id: string): void {
+    console.log("Llenando campos de plantilla de id: ", id);
+    if (this.ejecutado === false) {
+      try {
+        this.request.get(environment.PLANTILLAS_SERVICE, 'plantilla').subscribe((res) => {
+          this.plantillaForm.setControl('nombre', this.fb.control(res.data[0].nombre));
+          this.plantillaForm.setControl('tipo', this.fb.control(res.data[0].tipo));
+          this.plantillaForm.setControl('descripcion', this.fb.control(res.data[0].descripcion));
+        });
+      } catch (error) {
+        console.error("Error: ", error);
+      }
+    }
+    this.ejecutado = true;
+  }
+
+  actualizarPlantilla(): void {
+
+    // const plantillaPost: Plantilla = {
+    //   Id: 0,
+    //   Tipo: this.tipo,
+    //   Nombre: this.nombre,
+    //   Descripcion: this.descripcion,
+    //   Contenido: this.contenido,
+    //   EnlaceDoc: this.enlace,
+    //   Version: 0,
+    //   versionActual: this.versionActual,
+    //   FechaCreacion: '',
+    //   FechaModificacion: '',
+    //   Activo: true
+    // };
+
+    // this.request.put(
+    //   environment.PLANTILLAS_MID_SERVICE, 'plantilla', plantillaPost).subscribe({
+    //     next: (response: Respuesta) => {
+    //       if (response.Success) {
+    //         this.popUp.close();
+    //         if (response.Data == null || (response.Data as any).length === 0) {
+    //           this.popUp.warning('Ha ocurrido un error al crear la plantilla');
+    //         } else {
+    //           this.popUp.success('La plantilla se ha creado correctamente');
+    //         }
+    //       }
+    //     }, error: () => {
+    //       this.popUp.close();
+    //       this.popUp.error("No existen peticiones asociadas al coordinador.");
+    //     }
+    //   });
   }
 
 }

@@ -5,7 +5,7 @@ import { UtilService } from '../services/utilService';
 import { UserService } from '../services/userService';
 import { TablaPlantilla } from 'app/@core/models/tablaPlantilla';
 import { environment } from 'environments/environment';
-
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vista-plantillas',
@@ -21,6 +21,7 @@ export class VistaPlantillasComponent implements OnInit {
 
   constructor(
     private request: RequestManager,
+    private router: Router,
     private popUp: UtilService,
     private userService: UserService
   ) {
@@ -46,14 +47,14 @@ export class VistaPlantillasComponent implements OnInit {
         columnTitle: 'Acciones',
         custom: [
           {
-            name: 'Aprobar',
+            name: 'Editar',
             icon: 'fas fa-check',
-            template: '<em title="Rechazar" class="rechazar"><button mat-button type="button">    <i class="fas fa-times"></i></button></em>',
-            title: ''
+            template: '',
+            title: 'Editar'
           },
           {
-            name: 'Rechazar',
-            title: ''
+            name: 'Eliminar',
+            title: 'Eliminar'
           }
         ],
       },
@@ -68,7 +69,14 @@ export class VistaPlantillasComponent implements OnInit {
 
   Acciones(event): void {
     switch (event.action) {
-      case "Aprobar": {
+      case "Editar": {
+        console.log("Editar");
+        console.log(event.data);
+        this.router.navigate(['pages/creacion_plantilla', "123"]);
+        break;
+      }
+      case "Eliminar": {
+        console.log("Eliminar");
         break;
       }
       case "Rechazar": {
@@ -78,17 +86,36 @@ export class VistaPlantillasComponent implements OnInit {
   }
 
   consultarPlantillas(): any {
-    if (this.ejecutado === false) {
-      try {
-        this.request.get(environment.PLANTILLAS_MID_SERVICE, 'plantilla').subscribe((res) => {
-          this.dataPlantillas = new LocalDataSource(res.Data);
-          console.log(this.dataPlantillas);
-        });
-      } catch (error) {
-        console.error("Error: ", error);
-      }
-    }
-    this.ejecutado = true;
+
+    const array = [];
+    array[0] = {
+      contenido: "<html lang=\"en\"><head><meta charset=\"UTF-8\"><title>Titulo Seccion</title></head><body><p>Este es un párrafo de texto.</p></body></html>",
+      descripcion: "Plantilla para documentos tipo 1 - Acta de inicio",
+      enlaceDoc: "",
+      fechaCreacion: "2023-12-19 17:05:41.137000",
+      fechaModificacion: "2023-12-19 17:05:41.137000",
+      nombre: "Plantilla de prueba",
+      responsable: "Pruebasoas",
+      tipo: "Acta de inicio",
+      version: 1,
+      versionActual: true,
+      _id: "6581cd65365a47f73d07780a"
+    };
+
+    this.dataPlantillas = new LocalDataSource(array);
+
+    // if (this.ejecutado === false) {
+    //   try {
+    //     this.request.get(environment.PLANTILLAS_SERVICE, 'plantilla').subscribe((res) => {
+    //       console.log(res.data);
+    //       this.dataPlantillas = new LocalDataSource(array);
+    //       console.log(this.dataPlantillas);
+    //     });
+    //   } catch (error) {
+    //     console.error("Error: ", error);
+    //   }
+    // }
+    // this.ejecutado = true;
   }
 
   plantillaSeleccionada(event): void {

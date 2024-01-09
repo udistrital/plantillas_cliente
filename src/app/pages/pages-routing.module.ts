@@ -21,6 +21,10 @@ const routes: Routes = [{
       component: VistaPlantillasComponent,
     },
     {
+      path: 'creacion_plantilla/:id',
+      component: CreacionPlantillaComponent,
+    },
+    {
       path: 'creacion_plantilla',
       component: CreacionPlantillaComponent,
     }
