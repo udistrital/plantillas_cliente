@@ -1,0 +1,58 @@
+<form [formGroup]="seccionesForm">
+    <div class="panel">
+        <div formArrayName="secciones">
+            <div class="row" *ngFor="let seccion of listaSecciones.controls; let i = index" [formGroupName]="i">
+                <div style="margin: 20px; width: 13%;">
+                    <button mat-button class="secButton" [disabled]="isButtonDisabled(i)" (click)="agregarSeccion(i)"
+                        aria-label="">
+                        <!-- {{ esSubseccion(i) ? 'Subsección' : 'Sección' }} -->
+                        <mat-icon>library_add</mat-icon>
+                    </button>
+                </div>
+                <div style="width: 75%; border: solid 1px black;">
+                    <div class="row">
+                        <div style="width:auto;">{{ i }}</div>
+                        <div style="width:20%;">
+                            <div class="items">
+                                <button mat-mini-fab color="item" aria-label="agregarTexto" (click)="agregarTexto(i)"
+                                    class="small-button">
+                                    <mat-icon class="small-icon">text_fields</mat-icon>
+                                </button>
+                                <button mat-mini-fab color="item" aria-label="agregarTaba" (click)="agregarTabla(i)"
+                                    class="small-button">
+                                    <mat-icon class="small-icon">input</mat-icon>
+                                </button>
+                            </div>
+                            <div class="items">
+                                <button mat-mini-fab color="item" aria-label="agregarCampo" (click)="agregarCampo(i)"
+                                    class="small-button">
+                                    <mat-icon class="small-icon">table_chart</mat-icon>
+                                </button>
+                                <button mat-mini-fab color="item" aria-label="agregarImagen" (click)="agregarImagen(i)"
+                                    class="small-button">
+                                    <mat-icon class="small-icon">image</mat-icon>
+                                </button>
+                            </div>
+
+                        </div>
+                        <div style="width: auto;">
+                            <app-form-secciones *ngIf="esSubseccion(i)" [seccionesForm]="seccion"></app-form-secciones>
+                        </div>
+                    </div>
+                </div>
+                <div style="width: 12%;">
+                    <button mat-icon-button color="arrow" (click)="subirSeccion(i, i-1)">
+                        <mat-icon>arrow_upward</mat-icon>
+                    </button>
+                    <button mat-icon-button color="arrow" (click)="subirSeccion(i, i+1)">
+                        <mat-icon>arrow_downward</mat-icon>
+                    </button>
+                    <button mat-mini-fab color="delete" class="delButton" (click)="eliminarSeccion(i)"
+                        aria-label="eliminarSeccion">
+                        <mat-icon>clear</mat-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

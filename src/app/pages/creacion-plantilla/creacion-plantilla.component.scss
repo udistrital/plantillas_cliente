@@ -1,11 +1,7 @@
+@import "../../../styles.scss";
+
 .plantillas-title {
     text-align: center;
-}
-
-.container-name {
-    display: flex;
-    flex-direction: column;
-    width: 25%;
 }
 
 .mat-card-margin {
@@ -13,31 +9,16 @@
     width: auto;
 }
 
-.table .card-oas {
-    width: 98%;
-}
-
 .panel {
     border-color: #f5f5f5;
-    margin: 18px 18px 0px 18px;
+    margin: 20px;
     box-shadow: 0 0.5rem 1rem 0 rgba(44, 51, 73, 0.1);
+    border: solid 1px black;
 }
 
 .form-time mat-form-field {
     margin-left: 32px;
     width: 30%;
-}
-
-.container {
-    display: flex;
-    margin-right: -5px;
-    margin-left: -5px;
-}
-
-.form-column {
-    flex: 0 0 50%;
-    padding-right: 5px;
-    padding-left: 5px;
 }
 
 .table ng2-smart-table {
@@ -50,25 +31,13 @@
     position: relative;
     left: 47%;
     color: white;
-    background-color: --primary;
+    background-color: map-get($primary, 500);
 }
 
-.full-width {
-    width: 100%;
-}
-
-.mat-input-element::placeholder {
-    padding-left: 10px;
-    text-align: center;
-}
 
 .row {
     display: flex;
 }
-
-// .row div {
-//     flex: 1;
-// }
 
 .infoGeneral {
     width: 18%;
@@ -99,23 +68,30 @@
     border-radius: 5px;
 }
 
-td {
-    background-color: beige;
-    text-align: center;
-}
-
 #content {
     margin-top: 20px;
     margin-bottom: 20px;
     position: relative;
     left: 47%;
-    color: white;
-    background-color: --primary;
+    background-color: map-get($primary, 500);
+    color: map-get(map-get($primary, contrast), 500);
 }
 
 .secButton {
     margin: 20px;
     position: relative;
-    color: white;
-    background-color: forestgreen;
+    width: fit-content;
+    background-color: map-get($primary, 500);
+    color: map-get(map-get($primary, contrast), 500);
+}
+
+.mat-flat-button {
+    margin: 20px;
+    position: relative;
+    background-color: map-get($primary, 500);
+    color: map-get(map-get($primary, contrast), 500);
+}
+
+.mat-card-title {
+    margin-top: 20px;
 }

@@ -11,9 +11,7 @@ import { Seccion } from 'app/@core/models/seccion';
 import { Campo } from 'app/@core/models/campo';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-// import { ScrollingModule } from '@angular/cdk/scrolling';
-
-const pdf = new jsPDF();
+import { FormSeccionesComponent } from './form-secciones/form-secciones.component';
 
 @Component({
   selector: 'app-creacion-plantilla',
@@ -23,20 +21,14 @@ const pdf = new jsPDF();
 export class CreacionPlantillaComponent implements OnInit {
 
   plantillaForm: FormGroup;
+
+  seccionesData: Seccion[] = [];
+
   ejecutado: boolean = false;
   tiposPlantilla = [];
   tipoSeleccionado: string = '';
 
-  @ViewChild('content', { static: false }) el!: ElementRef;
-
-  pdfSrc: string;
-
-  plantillaHTML: string = `
-    <div>
-      <h1>Mi Plantilla HTML</h1>
-      <p>Contenido de la plantilla...</p>
-    </div>
-  `;
+  @ViewChild(FormSeccionesComponent) seccionesComponent: FormSeccionesComponent;
 
   constructor(
     private request: RequestManager,
@@ -53,14 +45,6 @@ export class CreacionPlantillaComponent implements OnInit {
       versionActual: 1,
       secciones: this.fb.array([]),
     });
-    const seccion = this.fb.group({
-      Posicion: 1,
-      Nombre: ['', Validators.required],
-      Descripcion: ['', Validators.required],
-      Campo: '',
-      EstiloFuente: ['', Validators.required],
-    });
-    this.secciones.push(seccion);
   }
 
   get secciones() {
@@ -69,7 +53,7 @@ export class CreacionPlantillaComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this, this.tiposPlantilla = [
+    this.tiposPlantilla = [
       { id: 1, Nombre: 'Factura'},
       { id: 2, Nombre: 'Contrato'},
       { id: 3, Nombre: 'Acta de inicio'},
@@ -85,34 +69,40 @@ export class CreacionPlantillaComponent implements OnInit {
     });
   }
 
-  agregarSeccion() {
-    console.log("Agregando seccion: ", this.secciones);
-    if (this.secciones) {
-      const seccion = this.fb.group({
-        Posicion: '',
-        Nombre: ['', Validators.required],
-        Descripcion: ['', Validators.required],
-        Campo: '',
-        EstiloFuente: ['', Validators.required],
-      });
-      this.secciones.push(seccion);
+  agregarSecciones(seccionesData: Seccion[]) {
+    this.seccionesData = seccionesData;
 
-    } else {
-      console.error("Formulario no inicializado correctamente");
-    }
+    console.log(this.seccionesData);
+  }
+
+  agregarSubseccion(index: number) {
+    const nuevaSeccion = this.fb.group({
+      nombre: ['', Validators.required],
+      descripcion: ['', Validators.required],
+      subsecciones: this.fb.array([]),
+    });
+
+    const seccion = this.secciones.at(index) as FormGroup;
+    const subsecciones = seccion.get('subsecciones') as FormArray;
+    subsecciones.push(nuevaSeccion);
   }
 
   eliminarSeccion(index: number) {
     this.secciones.removeAt(index);
   }
 
+  agregarTexto(index: number) {
+
+  }
+
   generarPlantilla(): void {
+
     console.log("Generando plantilla: ", this.plantillaForm.value);
 
     const plantillaPost = this.plantillaForm.value;
 
 
-    const correct = this.postPlantilla(plantillaPost);
+    // const correct = this.postPlantilla(plantillaPost);
 
     // const pdf = new jsPDF();
     // pdf.html(html, {
