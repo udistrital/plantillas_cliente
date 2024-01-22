@@ -6,14 +6,13 @@ import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
-// import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RequestManager } from './pages/services/requestManager';
 import { UtilService } from './pages/services/utilService';
 import { UserService } from './pages/services/userService';
 import { MatDialog } from '@angular/material/dialog';
 import { ServiceWorkerModule } from "@angular/service-worker";
-import { environment } from 'environments/environment';
-
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -24,7 +23,7 @@ import { environment } from 'environments/environment';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    // BrowserAnimationsModule,
+    BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
   providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }, RequestManager, UtilService, UserService, MatDialog],
