@@ -1,58 +1,140 @@
-<form [formGroup]="seccionesForm">
-    <div class="panel">
-        <div formArrayName="secciones">
-            <div class="row" *ngFor="let seccion of listaSecciones.controls; let i = index" [formGroupName]="i">
-                <div style="margin: 20px; width: 13%;">
-                    <button mat-button class="secButton" [disabled]="isButtonDisabled(i)" (click)="agregarSeccion(i)"
-                        aria-label="">
-                        <!-- {{ esSubseccion(i) ? 'Subsección' : 'Sección' }} -->
-                        <mat-icon>library_add</mat-icon>
-                    </button>
-                </div>
-                <div style="width: 75%; border: solid 1px black;">
-                    <div class="row">
-                        <div style="width:auto;">{{ i }}</div>
-                        <div style="width:20%;">
-                            <div class="items">
-                                <button mat-mini-fab color="item" aria-label="agregarTexto" (click)="agregarTexto(i)"
-                                    class="small-button">
-                                    <mat-icon class="small-icon">text_fields</mat-icon>
-                                </button>
-                                <button mat-mini-fab color="item" aria-label="agregarTaba" (click)="agregarTabla(i)"
-                                    class="small-button">
-                                    <mat-icon class="small-icon">input</mat-icon>
-                                </button>
-                            </div>
-                            <div class="items">
-                                <button mat-mini-fab color="item" aria-label="agregarCampo" (click)="agregarCampo(i)"
-                                    class="small-button">
-                                    <mat-icon class="small-icon">table_chart</mat-icon>
-                                </button>
-                                <button mat-mini-fab color="item" aria-label="agregarImagen" (click)="agregarImagen(i)"
-                                    class="small-button">
-                                    <mat-icon class="small-icon">image</mat-icon>
-                                </button>
-                            </div>
-
-                        </div>
-                        <div style="width: auto;">
-                            <app-form-secciones *ngIf="esSubseccion(i)" [seccionesForm]="seccion"></app-form-secciones>
-                        </div>
-                    </div>
-                </div>
-                <div style="width: 12%;">
-                    <button mat-icon-button color="arrow" (click)="subirSeccion(i, i-1)">
-                        <mat-icon>arrow_upward</mat-icon>
-                    </button>
-                    <button mat-icon-button color="arrow" (click)="subirSeccion(i, i+1)">
-                        <mat-icon>arrow_downward</mat-icon>
-                    </button>
-                    <button mat-mini-fab color="delete" class="delButton" (click)="eliminarSeccion(i)"
-                        aria-label="eliminarSeccion">
-                        <mat-icon>clear</mat-icon>
-                    </button>
-                </div>
+<div class="row" [style.margin-left]="nivel * 20 + 'px'">Nivel {{ nivel }}</div>
+<form style="width: 100%" [formGroup]="seccionesForm">
+  <div class="panel">
+    <div formArrayName="secciones">
+      <div *ngFor="let seccion of listaSecciones.controls; let i = index" ngModelGroup="i">
+        <div *ngIf="esSubseccion(i)">
+          <!-- Datos de la sección -->
+          <div class="panel">
+            <div
+              style="width: 100%; justify-content: center; text-align: center; background-color: forestgreen; color: aliceblue;">
+              Sección # {{i}} Nivel {{nivel}}</div>
+          </div>
+          <div class="row">
+            <div style="width: 40%">
+              <mat-form-field *ngIf="seccion" style="width: 70%; height: 100%; margin-left: 10%;">
+                <mat-label>Nombre de la sección</mat-label>
+                <input matInput formControlName="nombre" />
+              </mat-form-field>
             </div>
+            <div style="width: 60%">
+              <mat-form-field *ngIf="seccion" style="width: 80%; height: 100%;">
+                <mat-label>Descripción</mat-label>
+                <input matInput formControlName="descripcion" rows="2">
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- Contenido de la sección -->
+          <div class="secContent">
+            <center>Contenido</center>
+            <!-- Texto -->
+            <div style="width: 100%;" *ngFor="let campo of seccion.get('campos').controls; let j = index"
+              ngModelGroup="j">
+              <div *ngIf="camposImagen[j] == false">
+                <div class="row">
+                  <div style="width: 90%; margin: 10px;">
+                    <textarea [(ngModel)]="textAreaContent[j]" #textareaRef [ngModelOptions]="{standalone: true}"
+                      style="width: 100%;" [style.fontSize.px]="tamanosFuente[j]" [style.fontFamily]="estilosFUente[j]"
+                      rows="2"></textarea>
+                  </div>
+                  <div style="width: 10%;">
+                    <div class="row">
+                      <button mat-icon-button (click)="insertarCampo(j)" matTooltip="campo dinámico (cursor)">
+                        <mat-icon
+                          [ngStyle]="{'line-height': iconSizes, 'font-size': iconSizes, 'width': iconSizes, 'height': iconSizes}">input</mat-icon>
+                      </button>
+                    </div>
+                    <div class="row">
+                      <button mat-icon-button (click)="eliminarCampo(i,j)" matTooltip="eliminar este campo">
+                        <mat-icon
+                          [ngStyle]="{'line-height': iconSizes, 'font-size': iconSizes, 'width': iconSizes, 'height': iconSizes}">clear</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div style="width: 8%; margin: 10px;">
+                    <mat-form-field style="width: 100%;">
+                      <mat-label>Fuente</mat-label>
+                      <mat-select formControlName="estiloFuente" (selectionChange)="actualizarFuente($event, j)">
+                        <mat-option value="Arial">Arial</mat-option>
+                        <mat-option value="Verdana">Verdana</mat-option>
+                        <mat-option value="Helvetica">Helvetica</mat-option>
+                        <mat-option value="Times New Roman">Times New Roman</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div style="width: 7%; margin: 10px;">
+                    <mat-form-field style="width: 100%;">
+                      <mat-label>Tamaño (px)</mat-label>
+                      <input matInput type="number" (change)="actualizarTamano($event, j)"
+                        formControlName="tamanoFuente">
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="camposImagen[j] == true">
+                <!-- Imagen -->
+                <div class="row" style="margin: 10px;">
+                  <input type="file" (change)="onselectFile($event)">
+                  <img [src]="imagenUrls[j]" width="100" style="margin-left: 10px; margin-right: 10px;">
+                  <button mat-icon-button (click)="eliminarCampo(i,j)" matTooltip="eliminar este campo">
+                    <mat-icon
+                      [ngStyle]="{'line-height': iconSizes, 'font-size': iconSizes, 'width': iconSizes, 'height': iconSizes}">clear</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Secciones -->
+            <div class="row">
+              <div style="width: 100%;">
+                Secciones
+                <app-form-secciones [seccionesForm]="seccion" [nivel]="calcularNivel(i, nivel)"></app-form-secciones>
+              </div>
+            </div>
+          </div>
+          <!-- Botones de la sección -->
         </div>
+        <div class="row">
+          <!-- Agregar seccion -->
+          <div style="margin-left: 10px; margin-right: 10px;">
+            <button mat-icon-button class="secButton" (click)="agregarSeccion(i)" matTooltip="Nueva sección">
+              <mat-icon
+                [ngStyle]="{'line-height': iconSizes, 'font-size': iconSizes, 'width': iconSizes, 'height': iconSizes}">library_add</mat-icon>
+            </button>
+          </div>
+          <!-- Agregar campos -->
+          <div *ngIf="esSubseccion(i)" style="width: auto; margin-left: 10px; margin-right: 10px;">
+            <button mat-icon-button (click)="agregarCampo(i)" matTooltip="Nuevo campo de texto">
+              <mat-icon
+                [ngStyle]="{'line-height': iconSizes, 'font-size': iconSizes, 'width': iconSizes, 'height': iconSizes}">text_fields</mat-icon>
+            </button>
+            <!-- <button mat-icon-button (click)="agregarCampo(i)" matTooltip="nuevo campo dinámico">
+              <mat-icon
+                [ngStyle]="{'line-height': iconSizes, 'font-size': iconSizes, 'width': iconSizes, 'height': iconSizes}">input</mat-icon>
+            </button> -->
+            <button mat-icon-button (click)="agregarImagen(i)" matTooltip="Nueva imagen">
+              <mat-icon
+                [ngStyle]="{'line-height': iconSizes, 'font-size': iconSizes, 'width': iconSizes, 'height': iconSizes}">image</mat-icon>
+            </button>
+            <button mat-icon-button (click)="subirSeccion(i, i-1)" matTooltip="subir una posición">
+              <mat-icon
+                [ngStyle]="{'line-height': iconSizes, 'font-size': iconSizes, 'width': iconSizes, 'height': iconSizes}">arrow_upward</mat-icon>
+            </button>
+            <button mat-icon-button (click)="subirSeccion(i, i+1)" matTooltip="bajar una posición">
+              <mat-icon
+                [ngStyle]="{'line-height': iconSizes, 'font-size': iconSizes, 'width': iconSizes, 'height': iconSizes}">arrow_downward</mat-icon>
+            </button>
+          </div>
+          <!-- Eliminar sección -->
+          <div *ngIf="esSubseccion(i)" style="margin-left: 10px; margin-right: 10px;">
+            <button mat-icon-button (click)="eliminarSeccion(i)" matTooltip="eliminar esta sección">
+              <mat-icon
+                [ngStyle]="{'line-height': iconSizes, 'font-size': iconSizes, 'width': iconSizes, 'height': iconSizes}">clear</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </form>
