@@ -50,20 +50,21 @@ export class CreacionPlantillaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.tiposPlantilla = [
-      { id: 1, Nombre: 'Contrato' },
-      { id: 2, Nombre: '' },
-      { id: 3, Nombre: 'Acta de inicio' },
-      { id: 4, Nombre: 'Informe' },
-    ];
 
-    this.route.queryParams.subscribe((params) => {
+    this.route.params.subscribe((params) => {
       if (params['id']) {
         this.llenarCampos(params['id']);
       } else {
         console.log('Creación de plantilla');
       }
     });
+
+    this.tiposPlantilla = [
+      { id: 1, Nombre: 'Contrato' },
+      { id: 2, Nombre: '' },
+      { id: 3, Nombre: 'Acta de inicio' },
+      { id: 4, Nombre: 'Informe' },
+    ];
   }
 
   agregarSecciones(seccionesData: Seccion[]) {
@@ -121,16 +122,13 @@ export class CreacionPlantillaComponent implements OnInit {
     if (this.ejecutado === false) {
       try {
         this.request
-          .get(environment.PLANTILLAS_SERVICE, 'plantilla')
+          .get(environment.PLANTILLAS_SERVICE, 'plantilla/' + id)
           .subscribe((res) => {
             this.plantillaForm.setControl(
               'nombre',
               this.fb.control(res.data[0].nombre)
             );
-            this.plantillaForm.setControl(
-              'tipo',
-              this.fb.control(res.data[0].tipo)
-            );
+            this.plantillaForm.get('tipo').setValue(res.data[0].tipo);
             this.plantillaForm.setControl(
               'descripcion',
               this.fb.control(res.data[0].descripcion)

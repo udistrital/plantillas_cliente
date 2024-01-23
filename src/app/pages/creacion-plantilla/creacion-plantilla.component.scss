@@ -12,8 +12,7 @@
 .panel {
     border-color: #f5f5f5;
     margin: 20px;
-    box-shadow: 0 0.5rem 1rem 0 rgba(44, 51, 73, 0.1);
-    border: solid 1px black;
+    box-shadow: 0 0.5rem 2rem 0 rgba(44, 51, 73, 0.1);
 }
 
 .form-time mat-form-field {
@@ -78,11 +77,8 @@
 }
 
 .secButton {
-    margin: 20px;
-    position: relative;
-    width: fit-content;
-    background-color: map-get($primary, 500);
-    color: map-get(map-get($primary, contrast), 500);
+    background-color: white;
+    color: forestgreen;
 }
 
 .mat-flat-button {
@@ -92,6 +88,10 @@
     color: map-get(map-get($primary, contrast), 500);
 }
 
-.mat-card-title {
+.titulo {
     margin-top: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    color: forestgreen;
 }
