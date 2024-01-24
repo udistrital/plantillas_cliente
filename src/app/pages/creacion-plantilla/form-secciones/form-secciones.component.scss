@@ -1,20 +1,24 @@
 @import "../creacion-plantilla.component.scss";
 
 .row {
-    display: flex;
-    height: 100%;
+    display: flex-start;
 }
 
 .items {
-    display: flex;
+    display: flex-start;
     align-items: center;
     justify-content: center;
-    height: 50%;
+    height: 30px;
+    width: 30px;
 }
 
-// .mat-mini-fab {
-//     margin: 2px;
-// }
+.secContent {
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+    width: auto;
+    border: solid 1px black;
+}
 
 .mat-delete {
     color: map-get(map-get($primary, contrast), A200);
@@ -27,6 +31,7 @@
 }
 
 .mat-arrow {
+    margin: 10px;
     color: map-get(map-get($primary, contrast), A700);
     background-color: map-get($primary, A700);
 }
@@ -45,6 +50,6 @@
 }
 
 .small-icon {
-    font-size: 60%; // Adjust this value to change the size of the icon
-    line-height: 47%; // This should be the same as font-size to vertically center the icon
+    font-size: 80%;
+    line-height: 70%;
 }

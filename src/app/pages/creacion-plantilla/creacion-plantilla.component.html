@@ -18,16 +18,16 @@
                         <mat-form-field *ngIf="plantillaForm">
                             <mat-label>Tipo de plantilla</mat-label>
                             <select matNativeControl formControlName="tipo">
-                                <option *ngFor="let tipo of tiposPlantilla" [value]="tipoSeleccionado">{{ tipo.Nombre }}
+                                <option *ngFor="let tipo of tiposPlantilla" [value]="tipo.Nombre">{{ tipo.Nombre }}
                                 </option>
                             </select>
                         </mat-form-field>
                     </div>
                 </div>
                 <div style="width: 82%;">
-                    <mat-card-title>
+                    <div class="titulo">
                         Secciones
-                    </mat-card-title>
+                    </div>
                     <app-form-secciones (agregarSecciones)="agregarSecciones($event)"></app-form-secciones>
                 </div>
             </div>

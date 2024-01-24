@@ -1,25 +1,22 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import jsPDF from 'jspdf';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { RequestManager } from '../services/requestManager';
 import { UtilService } from '../services/utilService';
 import { UserService } from '../services/userService';
-import { environment } from 'environments/environment';
-import { Plantilla } from 'app/@core/models/plantilla';
-import { Respuesta } from 'app/@core/models/respuesta';
+import { environment } from '../../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Seccion } from 'app/@core/models/seccion';
-import { Campo } from 'app/@core/models/campo';
+import { Seccion } from 'src/app/@core/models/seccion';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FormSeccionesComponent } from './form-secciones/form-secciones.component';
+import { Plantilla } from 'src/app/@core/models/plantilla';
+import { Respuesta } from 'src/app/@core/models/respuesta';
 
 @Component({
   selector: 'app-creacion-plantilla',
   templateUrl: './creacion-plantilla.component.html',
-  styleUrls: ['./creacion-plantilla.component.scss']
+  styleUrls: ['./creacion-plantilla.component.scss'],
 })
 export class CreacionPlantillaComponent implements OnInit {
-
   plantillaForm: FormGroup;
 
   seccionesData: Seccion[] = [];
@@ -37,6 +34,7 @@ export class CreacionPlantillaComponent implements OnInit {
     private http: HttpClient,
     private fb: FormBuilder,
     private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {
     this.plantillaForm = this.fb.group({
       nombre: '',
@@ -53,20 +51,20 @@ export class CreacionPlantillaComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.tiposPlantilla = [
-      { id: 1, Nombre: 'Factura'},
-      { id: 2, Nombre: 'Contrato'},
-      { id: 3, Nombre: 'Acta de inicio'},
-      { id: 4, Nombre: 'Informe'},
-    ];
-
-    this.route.queryParams.subscribe(params => {
+    this.route.params.subscribe((params) => {
       if (params['id']) {
         this.llenarCampos(params['id']);
       } else {
-        console.log("Creación de plantilla");
+        console.log('Creación de plantilla');
       }
     });
+
+    this.tiposPlantilla = [
+      { id: 1, Nombre: 'Contrato' },
+      { id: 2, Nombre: '' },
+      { id: 3, Nombre: 'Acta de inicio' },
+      { id: 4, Nombre: 'Informe' },
+    ];
   }
 
   agregarSecciones(seccionesData: Seccion[]) {
@@ -91,108 +89,75 @@ export class CreacionPlantillaComponent implements OnInit {
     this.secciones.removeAt(index);
   }
 
-  agregarTexto(index: number) {
-
-  }
-
   generarPlantilla(): void {
-
-    console.log("Generando plantilla: ", this.plantillaForm.value);
-
+    console.log('Generando plantilla: ', this.plantillaForm.value);
+    // plantilla enviada desde el componente de secciones
     const plantillaPost = this.plantillaForm.value;
-
-
-    // const correct = this.postPlantilla(plantillaPost);
-
-    // const pdf = new jsPDF();
-    // pdf.html(html, {
-    //   callback: () => {
-    //     pdf.save('descarga(0).pdf');
-    //   }
-    // });
-
+    this.postPlantilla(plantillaPost);
   }
 
   postPlantilla(plantillaPost: any) {
-    console.log("Posteando plantilla: ", plantillaPost);
-    // try {
-    //   this.request.post(environment.PLANTILLAS_MID_SERVICE, 'plantilla', plantillaPost).subscribe((res) => {
-    //     console.log("Respuesta: ", res);
-    //   });
-    // } catch (error) {
-    //   console.error("Error: ", error);
-    // }
+    console.log('Posteando plantilla: ', plantillaPost);
+    try {
+      this.request.post(environment.PLANTILLAS_MID_SERVICE, 'plantilla', plantillaPost).subscribe((res) => {
+        console.log("Respuesta: ", res);
+      });
+    } catch (error) {
+      console.error("Error: ", error);
+    }
   }
 
   crearPDF(content: any) {
-
     const options = {
       margin: 10,
       filename: 'documento.pdf',
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    }
-
-    // content = this.plantillaHTML;
-    // const content = this.el.nativeElement;
-
-    let pdf = new jsPDF('p', 'pt', 'a4');
-    pdf.html(content, {
-      callback: (pdf) => {
-        pdf.save("test.pdf");
-      }
-    });
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    };
   }
 
   llenarCampos(id: string): void {
-    console.log("Llenando campos de plantilla de id: ", id);
+    console.log('Llenando campos de plantilla de id: ', id);
     if (this.ejecutado === false) {
       try {
-        this.request.get(environment.PLANTILLAS_SERVICE, 'plantilla').subscribe((res) => {
-          this.plantillaForm.setControl('nombre', this.fb.control(res.data[0].nombre));
-          this.plantillaForm.setControl('tipo', this.fb.control(res.data[0].tipo));
-          this.plantillaForm.setControl('descripcion', this.fb.control(res.data[0].descripcion));
-        });
+        this.request
+          .get(environment.PLANTILLAS_SERVICE, 'plantilla/' + id)
+          .subscribe((res) => {
+            this.plantillaForm.setControl(
+              'nombre',
+              this.fb.control(res.data[0].nombre)
+            );
+            this.plantillaForm.get('tipo').setValue(res.data[0].tipo);
+            this.plantillaForm.setControl(
+              'descripcion',
+              this.fb.control(res.data[0].descripcion)
+            );
+          });
       } catch (error) {
-        console.error("Error: ", error);
+        console.error('Error: ', error);
       }
     }
     this.ejecutado = true;
   }
 
   actualizarPlantilla(): void {
-
-    // const plantillaPost: Plantilla = {
-    //   Id: 0,
-    //   Tipo: this.tipo,
-    //   Nombre: this.nombre,
-    //   Descripcion: this.descripcion,
-    //   Contenido: this.contenido,
-    //   EnlaceDoc: this.enlace,
-    //   Version: 0,
-    //   versionActual: this.versionActual,
-    //   FechaCreacion: '',
-    //   FechaModificacion: '',
-    //   Activo: true
-    // };
-
-    // this.request.put(
-    //   environment.PLANTILLAS_MID_SERVICE, 'plantilla', plantillaPost).subscribe({
-    //     next: (response: Respuesta) => {
-    //       if (response.Success) {
-    //         this.popUp.close();
-    //         if (response.Data == null || (response.Data as any).length === 0) {
-    //           this.popUp.warning('Ha ocurrido un error al crear la plantilla');
-    //         } else {
-    //           this.popUp.success('La plantilla se ha creado correctamente');
-    //         }
-    //       }
-    //     }, error: () => {
-    //       this.popUp.close();
-    //       this.popUp.error("No existen peticiones asociadas al coordinador.");
-    //     }
-    //   });
+    const plantillaPost: any = {};
+    this.request.put(
+      environment.PLANTILLAS_MID_SERVICE, 'plantilla', plantillaPost, '').subscribe({
+        next: (response: Respuesta) => {
+          if (response.Success) {
+            this.popUp.close();
+            if (response.Data == null || (response.Data as any).length === 0) {
+              this.popUp.warning('Ha ocurrido un error al crear la plantilla');
+            } else {
+              this.popUp.success('La plantilla se ha creado correctamente');
+            }
+          }
+        }, error: () => {
+          this.popUp.close();
+          this.popUp.error("No existen peticiones asociadas al coordinador.");
+        }
+      });
   }
-
 }
