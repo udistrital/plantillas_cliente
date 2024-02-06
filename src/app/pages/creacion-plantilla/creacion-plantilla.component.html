@@ -6,36 +6,84 @@
         <form [formGroup]="plantillaForm">
             <div class="form-row" style="border: 1px solid #000;"></div>
             <br>
-            <div class="panel row">
+            <div class="panel">
                 <div class="infoGeneral">
-                    <div style="margin: 20px;">
-                        <mat-form-field *ngIf="plantillaForm">
-                            <mat-label>Nombre de la plantilla</mat-label>
-                            <input matInput formControlName="nombre">
-                        </mat-form-field>
-                    </div>
-                    <div style="margin: 20px;">
-                        <mat-form-field *ngIf="plantillaForm">
-                            <mat-label>Tipo de plantilla</mat-label>
-                            <select matNativeControl formControlName="tipo">
-                                <option *ngFor="let tipo of tiposPlantilla" [value]="tipo.Nombre">{{ tipo.Nombre }}
-                                </option>
-                            </select>
-                        </mat-form-field>
-                    </div>
+                    <mat-form-field *ngIf="plantillaForm">
+                        <mat-label>Nombre de la plantilla</mat-label>
+                        <input matInput formControlName="nombre">
+                    </mat-form-field>
+                    <mat-form-field *ngIf="plantillaForm">
+                        <mat-label>Tipo de plantilla</mat-label>
+                        <select matNativeControl formControlName="tipo">
+                            <option *ngFor="let tipo of tiposPlantilla" [value]="tipo">{{ tipo }}
+                            </option>
+                        </select>
+                    </mat-form-field>
                 </div>
-                <div style="width: 82%;">
+                <div style="width: 100%;">
                     <div class="titulo">
                         Secciones
                     </div>
-                    <app-form-secciones (agregarSecciones)="agregarSecciones($event)"></app-form-secciones>
+                    <!-- Componente de secciones (FormArray) -->
+                    <app-form-secciones [seccionesForm]="plantillaForm" formArrayName="secciones"
+                        (seccionesData)="updateForm($event)"></app-form-secciones>
+                    <!-- Agregar primera sección -->
+                    <button mat-raised-button *ngIf="plantillaForm.get('secciones').value.length === 0"
+                        class="sec-button" (click)="crearSeccion()" matTooltip="Agregar una sección">
+                        <mat-icon [ngStyle]="iconStyles">library_add</mat-icon>
+                    </button>
                 </div>
             </div>
             <div class="row">
-                <button mat-raised-button class="send" type="button" (click)="generarPlantilla()">
-                    Generar
+                <button mat-raised-button class="send" type="button" (click)="guardarPlantilla()">
+                    Guardar plantilla
+                </button>
+                <button mat-raised-button class="pdf" type="button" (click)="generarPdf()" [disabled]="sendDisabled">
+                    Generar pdf
+                </button>
+                <button mat-raised-button class="send" type="button" (click)="enviarPlantilla2()"
+                    [disabled]="sendDisabled">
+                    Registrar plantilla
                 </button>
             </div>
         </form>
     </mat-card-content>
 </mat-card>
+
+<pre> {{ plantillaForm.value | json }} </pre>
+
+<!-- <div id="elementoPlantilla">
+    <h1></h1>
+    <p></p>
+    <table>
+        <thead>
+            <tr>
+                <th>Campos</th>
+                <th>Sección</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let seccion of seccionesVista; let i = index" style="margin: 10px;">
+                <td>
+                    <ul>
+                        <li *ngFor="let campo of seccion.campos; let j = index">
+                            <div id="contenidoPlantilla">
+                                <div class="elementClass" *ngIf="campo.dataBinary != ''">
+                                    <img [src]="campo.dataBinary" style="width: 100px; height: 100px;">
+                                </div>
+                                <div style="margin: 10px;" class="elementClass" *ngIf="campo.dataBinary == ''"
+                                    [style.fontSize.px]="campo.tamanoFuente" [style.fontFamily]="campo.estiloFuente"
+                                    [style.fontWeight]="campo.negrita" [style.fontStyle]="campo.cursiva">
+                                    {{ campo.dataString }}
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </td>
+                <td>{{ seccion.nombre }}</td>
+                <td>{{ seccion.descripcion }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div> -->

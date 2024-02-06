@@ -8,91 +8,207 @@ import {
   ElementRef,
   ViewChildren,
   QueryList,
+  forwardRef,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
-import { Seccion } from 'src/app/@core/models/seccion';
+import { FormBuilder, FormGroup, Validators, FormArray, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 
 @Component({
   selector: 'app-form-secciones',
   templateUrl: './form-secciones.component.html',
   styleUrls: ['./form-secciones.component.scss'],
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => FormSeccionesComponent),
+    multi: true
+  }],
 })
-export class FormSeccionesComponent implements OnInit {
+export class FormSeccionesComponent implements ControlValueAccessor, OnInit {
 
-  textAreaContent: string[] = [];
-  @ViewChildren('textareaRef') textareaRefs: QueryList<ElementRef>;
-
-  @Output() seccionesData = new EventEmitter<any>();
+  @Output() seccionesData = new EventEmitter<FormArray>();
   @Input() nivel: number = 1.0;
   @Input() maxNivel: number = 5.0;
 
-  seccionesForm: FormGroup;
+  @Input() seccionesForm: FormGroup;
+
+  //variables para el control de formulario (ControlValueAccessor)
+  onChange: any = () => { };
+  onTouch: any = () => { };
+
+  // textAreaContent: string[] = [];
+  // @ViewChildren('textareaRef') textareaRefs: QueryList<ElementRef>;
+
+  secciones: FormArray;
 
   iconSizes: string = 25 / (this.nivel) + 'px';
 
   estilosFUente: string[] = [];
   tamanosFuente: number[] = [];
+  fontstyle: string[] = [];
+  negrita: string[] = [];
 
-  camposImagen: boolean[] = [];
+  camposImagen: number[] = [];
   imagenUrls: string[] = [];
+
+  // estilo de iconos de botones de secciones
+
+  iconStyles = {
+    'line-height': this.iconSizes,
+    'font-size': this.iconSizes,
+    'width': this.iconSizes,
+    'height': this.iconSizes
+  };
 
   private disabledButtons: boolean[] = [];
 
   constructor(private fb: FormBuilder, private cdr: ChangeDetectorRef) {
+
   }
 
   ngOnInit(): void {
-
-    this.seccionesForm = this.fb.group({
-      secciones: this.fb.array([]),
-    });
-
-    this.listaSecciones.push(
+    let secciones = this.fb.array([
       this.fb.group({
-        posicion: 0,
-        nombre: ['Seccion 1 Name', Validators.required],
-        descripcion: ['Esta sería la sección 1 y su descripción', Validators.required],
+        nombre: ['', Validators.required],
+        descripcion: ['', Validators.required],
         campos: this.fb.array([]),
-        estiloFuente: '',
-        fechaCreacion: '',
-        fechaModificacion: '',
-        activo: true,
+        direccion: ['', Validators.required],
       })
-    );
+    ]);
+    this.seccionesForm.setControl('secciones', secciones);
+  }
 
-    const nuevoCampo = this.fb.group({
-      nombre: ['Párrafo de texto', Validators.required],
-      dataString: 'Texto1',
-      dataBinary: '',
-      estiloFuente: 'Arial, sans-serif',
-      tamanoFuente: 16,
-      fechaCreacion: '',
-      fechaModificacion: '',
-      imagen: true,
-    });
+  // Funciones para el control del formulario de secciones
 
-    const nuevaImagen = this.fb.group({
-      nombre: ['Nombre de la imagen', Validators.required],
-      dataString: 'Imagen1',
-      dataBinary: '',
-      estiloFuente: 'Arial, sans-serif',
-      tamanoFuente: 16,
-      fechaCreacion: '',
-      fechaModificacion: '',
-      imagen: true,
-    });
-
-    const camposControl = (this.listaSecciones.controls[0] as FormGroup).get(
-      'campos'
-    ) as FormArray || this.fb.array([]);
-
-    if (camposControl instanceof FormArray) {
-      console.log(camposControl);
-      camposControl.push(nuevoCampo);
-    } else {
-      console.error("'campos' no es un FormArray");
+  writeValue(obj: any): void {
+    console.log("writeValue");
+    if (obj != undefined) {
+      this.secciones.setValue(obj, { emitEvent: false });
     }
   }
+
+  registerOnChange(fn: any): void {
+    console.log("registerOnChange");
+    this.onChange = fn;
+    this.seccionesForm.get('secciones').valueChanges.subscribe(fn);
+  }
+
+  registerOnTouched(fn: any): void {
+    console.log("registerOnTouched");
+    this.onTouch = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    console.log("setDisabledState");
+    if (isDisabled) {
+      this.seccionesForm.get('secciones').disable();
+    } else {
+      this.seccionesForm.get('secciones').enable();
+    }
+  }
+
+  // TODO: Agregar secciones
+
+  // Funciones para la creación de secciones
+
+  public agregarSeccion(index?: number) {
+
+    let nuevaSeccion = this.fb.group({
+      nombre: ['', Validators.required],
+      descripcion: ['', Validators.required],
+      campos: this.fb.array([]),
+      direccion: ['', Validators.required],
+    });
+
+    let seccionesArray = this.seccionesForm.get('secciones') as FormArray;
+
+    seccionesArray.push(nuevaSeccion);
+
+  }
+
+  eliminarSeccion(index: number) {
+    let seccionesArray = this.seccionesForm.get('secciones') as FormArray;
+    seccionesArray.removeAt(index);
+  }
+
+  getSeccionesLength(): number {
+    return this.seccionesForm.get('secciones').value.length - 1;
+  }
+
+  cambiarDireccion(index: number, event: any) {
+    let seccion = this.seccionesForm.get('secciones') as FormArray;
+    seccion.at(index).get('direccion').setValue(event.value);
+  }
+
+  // Funciones para la creación de campos
+
+  agregarCampo(index: number) {
+
+    let nuevoCampo = this.fb.group({
+      nombre: ['Campo seccion ' + index, Validators.required],
+      dataString: '',
+      dataBinary: '',
+      estiloFuente: 'Arial, sans-serif',
+      tamanoFuente: 16,
+    });
+
+    let seccion = this.seccionesForm.get('secciones') as FormArray;
+    let campos = seccion.at(index).get('campos') as FormArray;
+
+    campos.push(nuevoCampo);
+  }
+
+  eliminarCampo(i: number, j: number) {
+    let seccion = this.seccionesForm.get('secciones') as FormArray;
+    let campos = seccion.at(i).get('campos') as FormArray;
+    campos.removeAt(j);
+  }
+
+  // Funciones para la creación de subsecciones
+
+  agregarSubseccion(index: number) {
+    let nuevaSubseccion = this.fb.array([
+      this.fb.group({
+        nombre: ['Subseccion 1', Validators.required],
+      }),
+      this.fb.group({
+        nombre: ['Subseccion 2', Validators.required],
+      }),
+    ])
+
+    let seccion = this.seccionesForm.get('secciones') as FormArray;
+    let campos = seccion.at(index).get('campos') as FormArray;
+
+    campos.push(nuevaSubseccion);
+  }
+
+  esSubseccion(campo: any): boolean {
+    return campo instanceof FormArray
+  }
+
+  // Funciones para el cambio de posición de secciones y campos
+
+  intercambioSeccion(i: number, j: number) {
+    if (j != -1) {
+      const secciones = this.seccionesForm.get('secciones') as FormArray;
+      const seccionI = secciones.at(i) as FormGroup;
+      const seccionAnterior = secciones.at(j) as FormGroup;
+      secciones.setControl(i, seccionAnterior);
+      secciones.setControl(j, seccionI);
+    }
+  }
+
+  intercambioCampo(i: number, j: number, k: number) {
+    if (k != -1) {
+      const secciones = this.seccionesForm.get('secciones') as FormArray;
+      const seccion = secciones.at(i) as FormGroup;
+      const campos = seccion.get('campos') as FormArray;
+      const campo = campos.at(j) as FormGroup;
+      const campoAnterior = campos.at(k) as FormGroup;
+      campos.setControl(j, campoAnterior);
+      campos.setControl(k, campo);
+    }
+  }
+
+  // ! Estas funciones no manejan bien los casos de subsecciones
 
   actualizarTamano(event: any, j: number) {
     this.tamanosFuente[j] = Number(event.target.value);
@@ -102,15 +218,23 @@ export class FormSeccionesComponent implements OnInit {
     this.estilosFUente[j] = event.value;
   }
 
+  actualizarPeso(event: any, j: number) {
+    this.negrita[j] = event.checked ? 'bold' : 'normal';
+  }
+
+  actualizarEstilo(event: any, j: number) {
+    this.fontstyle[j] = event.checked ? 'italic' : 'normal';
+  }
+
   insertarCampo(j: number) {
-    console.log("indice: ", j);
-    const text = " [ _ ] ";
-    const textArea = this.textareaRefs.toArray()[j].nativeElement as HTMLTextAreaElement;
-    const startPos = textArea.selectionStart;
-    const endPos = textArea.selectionEnd;
-    this.textAreaContent[j] = this.textAreaContent[j].substring(0, startPos) + text + this.textAreaContent[j].substring(endPos, this.textAreaContent[j].length);
-    textArea.selectionStart = startPos + text.length;
-    textArea.selectionEnd = startPos + text.length;
+    // console.log("indice: ", j);
+    // const text = " [ _ ] ";
+    // const textArea = this.textareaRefs.toArray()[j].nativeElement as HTMLTextAreaElement;
+    // const startPos = textArea.selectionStart;
+    // const endPos = textArea.selectionEnd;
+    // this.textAreaContent[j] = this.textAreaContent[j].substring(0, startPos) + text + this.textAreaContent[j].substring(endPos, this.textAreaContent[j].length);
+    // textArea.selectionStart = startPos + text.length;
+    // textArea.selectionEnd = startPos + text.length;
   }
 
   calcularNivel(index: number, nivel: number): number {
@@ -120,106 +244,117 @@ export class FormSeccionesComponent implements OnInit {
     return nivel + 1;
   }
 
-  enviarSecciones(event: Event) {
-    event.stopPropagation();
-    const data: Seccion[] = [
-      {
+  enviarSecciones() {
+    // event.stopPropagation();
+    const dataEmit = this.fb.array([
+      this.fb.group({
         posicion: 1,
-        nombre: 'Seccion 1',
-        descripcion: 'Descripcion de la seccion 1',
-        campos: [],
-        subSecciones: [],
-        estiloFuente: null,
-        fechaCreacion: '',
-        fechaModificacion: '',
-        activo: true,
-      },
-      {
-        posicion: 2,
-        nombre: 'Seccion 2',
-        descripcion: 'Descripcion de la seccion 2',
-        campos: [],
-        subSecciones: [],
-        estiloFuente: null,
-        fechaCreacion: '',
-        fechaModificacion: '',
-        activo: true,
-      },
-      {
-        posicion: 3,
-        nombre: 'Seccion 3',
-        descripcion: 'Descripcion de la seccion 3',
-        campos: [],
-        subSecciones: [],
-        estiloFuente: null,
-        fechaCreacion: '',
-        fechaModificacion: '',
-        activo: true,
-      },
-    ];
-    console.log(data);
-    this.seccionesData.emit(data);
-  }
-
-  agregarSeccion(index: number) {
-    if (this.listaSecciones) {
-      this.disabledButtons[index] = true;
-      const nuevaSeccion = this.fb.group({
-        posicion: 0,
-        nombre: ['Nombre de sección 2', Validators.required],
-        descripcion: ['No hay', Validators.required],
-        campos: this.fb.array([]),
+        nombre: ['Sección Número 1', Validators.required],
+        descripcion: ['Descripción de la sección Número 1', Validators.required],
+        campos: this.fb.array([
+          this.fb.group({
+            nombre: ['Texto1', Validators.required],
+            dataString: 'Contenido del campo 1',
+            dataBinary: '',
+            estiloFuente: 'Times New Roman, serif',
+            tamanoFuente: 19,
+            negrita: 'bold',
+            cursiva: 'italic',
+            fechaCreacion: '',
+            fechaModificacion: '',
+            tipo: 1,
+          }),
+          this.fb.group({
+            nombre: ['Imagen', Validators.required],
+            dataString: '',
+            dataBinary: '',
+            estiloFuente: '',
+            tamanoFuente: 13,
+            ancho: 200,
+            alto: 150,
+            fechaCreacion: '',
+            fechaModificacion: '',
+            tipo: 1,
+          }),
+        ]),
         estiloFuente: '',
         fechaCreacion: '',
         fechaModificacion: '',
         activo: true,
-      });
-      this.listaSecciones.push(nuevaSeccion);
-      this.listaSecciones.updateValueAndValidity();
-      this.cdr.detectChanges();
-    } else {
-      console.error('Formulario no inicializado correctamente');
-    }
-  }
-
-  eliminarSeccion(index: number) {
-    this.listaSecciones.removeAt(index);
-    this.disabledButtons.splice(index, 1);
-    // this.disabledButtons[index - 1] = false;
-  }
-
-  subirSeccion(i: number, j: number) {
-    const seccion = this.listaSecciones.at(i) as FormGroup;
-    const seccionAnterior = this.listaSecciones.at(j) as FormGroup;
-    this.listaSecciones.setControl(i, seccionAnterior);
-    this.listaSecciones.setControl(j, seccion);
-    this.disabledButtons[i] = false;
-    this.disabledButtons[j] = true;
-  }
-
-  agregarCampo(index: number) {
-    console.log("indice: ", index)
-    const nuevoCampo = this.fb.group({
-      // nombre: ['', Validators.required],
-      // descripcion: ['', Validators.required],
-      dataString: '',
-      dataBinary: '',
-      estiloFuente: 'Arial, sans-serif',
-      tamanoFuente: 16,
-      fechaCreacion: '',
-      fechaModificacion: '',
-      imagen: true
-    });
-    const camposControl = (this.listaSecciones.controls[index] as FormGroup).get('campos') as FormArray;
-    camposControl.push(nuevoCampo);
-    this.estilosFUente.push('Arial, sans-serif');
-    this.tamanosFuente.push(12);
-    this.camposImagen.push(false);
-  }
-
-  eliminarCampo(i: number, j: number) {
-    const camposControl = (this.listaSecciones.controls[i] as FormGroup).get('campos') as FormArray;
-    camposControl.removeAt(j);
+      }),
+      this.fb.group({
+        posicion: 0,
+        nombre: ['Seccion 2 Name', Validators.required],
+        descripcion: ['Esta sería la sección 2 y su descripción', Validators.required],
+        campos: this.fb.array([
+          this.fb.group({
+            nombre: ['Texto1', Validators.required],
+            dataString: 'Contenido del campo 1 seccion 2',
+            dataBinary: '',
+            estiloFuente: 'Arial, sans-serif',
+            tamanoFuente: 15,
+            negrita: 'normal',
+            cursiva: 'normal',
+            fechaCreacion: '',
+            fechaModificacion: '',
+            tipo: 1,
+          }),
+          this.fb.group({
+            nombre: ['Nombre del campo', Validators.required],
+            dataString: 'Contenido del campo 2 seccion 2',
+            dataBinary: '',
+            estiloFuente: 'Helvetica, sans-serif',
+            tamanoFuente: 13,
+            negrita: 'bold',
+            cursiva: 'normal',
+            fechaCreacion: '',
+            fechaModificacion: '',
+            tipo: 1,
+          }),
+        ]),
+        estiloFuente: '',
+        fechaCreacion: '',
+        fechaModificacion: '',
+        activo: true,
+      }),
+      this.fb.group({
+        posicion: 1,
+        nombre: ['Nombre de la seccion 3', Validators.required],
+        descripcion: ['Descricpción', Validators.required],
+        campos: this.fb.array([
+          this.fb.group({
+            nombre: ['Nombre 3', Validators.required],
+            dataString: 'Contenido del campo 1 seccion 3',
+            dataBinary: '',
+            estiloFuente: 'Times New Roman, serif',
+            tamanoFuente: 19,
+            negrita: 'bold',
+            cursiva: 'italic',
+            fechaCreacion: '',
+            fechaModificacion: '',
+            tipo: 1,
+          }),
+          this.fb.group({
+            nombre: ['Imagen', Validators.required],
+            dataString: 'Colocar aquí el texto',
+            dataBinary: '',
+            estiloFuente: '',
+            tamanoFuente: 13,
+            ancho: 200,
+            alto: 150,
+            fechaCreacion: '',
+            fechaModificacion: '',
+            tipo: 1,
+          }),
+        ]),
+        estiloFuente: '',
+        fechaCreacion: '',
+        fechaModificacion: '',
+        activo: true,
+      }),
+    ]);
+    this.seccionesData.emit(dataEmit);
+    // this.seccionesData.emit(this.seccionesForm.value);
   }
 
   agregarImagen(index: number) {
@@ -232,11 +367,11 @@ export class FormSeccionesComponent implements OnInit {
       tamanoFuente: 16,
       fechaCreacion: '',
       fechaModificacion: '',
-      imagen: true
+      tipo: 2
     });
     const camposControl = (this.listaSecciones.controls[index] as FormGroup).get('campos') as FormArray;
     camposControl.push(nuevaImagen);
-    this.camposImagen.push(true);
+    this.camposImagen.push(2);
     this.imagenUrls.push('../../../../assets/inosuke.jpg');
   }
 
@@ -255,9 +390,9 @@ export class FormSeccionesComponent implements OnInit {
     console.log("Tabla");
   }
 
-  esSubseccion(index: number): boolean {
-    return index > 0;
-  }
+  // esSubseccion(index: number): boolean {
+  //   return index > 0;
+  // }
 
   isButtonDisabled(index: number): boolean {
     return this.disabledButtons[index];
@@ -265,7 +400,8 @@ export class FormSeccionesComponent implements OnInit {
 
   get listaSecciones() {
     return (
-      (this.seccionesForm.get('secciones') as FormArray) || this.fb.array([])
+      (this.secciones.get('secciones') as FormArray) || this.fb.array([])
     );
   }
+
 }

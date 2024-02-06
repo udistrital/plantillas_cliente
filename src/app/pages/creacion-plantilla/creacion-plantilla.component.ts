@@ -1,15 +1,19 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, forwardRef } from '@angular/core';
 import { RequestManager } from '../services/requestManager';
 import { UtilService } from '../services/utilService';
 import { UserService } from '../services/userService';
 import { environment } from '../../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Seccion } from 'src/app/@core/models/seccion';
-import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormArray, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FormSeccionesComponent } from './form-secciones/form-secciones.component';
 import { Plantilla } from 'src/app/@core/models/plantilla';
 import { Respuesta } from 'src/app/@core/models/respuesta';
+import jspdf from 'jspdf';
+import html2canvas from 'html2canvas';
+import Swal from 'sweetalert2';
+
 
 @Component({
   selector: 'app-creacion-plantilla',
@@ -17,15 +21,24 @@ import { Respuesta } from 'src/app/@core/models/respuesta';
   styleUrls: ['./creacion-plantilla.component.scss'],
 })
 export class CreacionPlantillaComponent implements OnInit {
+
+  //
+  @ViewChild(FormSeccionesComponent) seccionesComponent: FormSeccionesComponent;
+  @ViewChild('formularioP') elementoForm: ElementRef;
+
+
   plantillaForm: FormGroup;
 
-  seccionesData: Seccion[] = [];
-
-  ejecutado: boolean = false;
   tiposPlantilla = [];
   tipoSeleccionado: string = '';
 
-  @ViewChild(FormSeccionesComponent) seccionesComponent: FormSeccionesComponent;
+  ejecutado: boolean = false;
+  seccionDisabled: boolean = false;
+  sendDisabled: boolean = true;
+
+  seccionesData: FormArray;
+
+  seccionesVista = [];
 
   constructor(
     private request: RequestManager,
@@ -37,16 +50,10 @@ export class CreacionPlantillaComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {
     this.plantillaForm = this.fb.group({
-      nombre: '',
-      tipo: '',
-      descripcion: '',
-      versionActual: 1,
+      nombre: ['Nombre', Validators.required],
+      tipo: ['Tipo', Validators.required],
       secciones: this.fb.array([]),
     });
-  }
-
-  get secciones() {
-    return this.plantillaForm.get('secciones') as FormArray;
   }
 
   ngOnInit(): void {
@@ -60,44 +67,57 @@ export class CreacionPlantillaComponent implements OnInit {
     });
 
     this.tiposPlantilla = [
-      { id: 1, Nombre: 'Contrato' },
-      { id: 2, Nombre: '' },
-      { id: 3, Nombre: 'Acta de inicio' },
-      { id: 4, Nombre: 'Informe' },
+      'Contrato',
+      'Acta de inicio',
+      'Informe',
+      'Novedad',
     ];
   }
 
-  agregarSecciones(seccionesData: Seccion[]) {
-    this.seccionesData = seccionesData;
-
-    console.log(this.seccionesData);
+  ngAfterViewInit() {
+    console.log("ngAfterViewInit");
   }
 
-  agregarSubseccion(index: number) {
-    const nuevaSeccion = this.fb.group({
+  // TODO: Agregar secciones
+
+  // Funciones para la creacion de plantillas
+
+  crearSeccion() {
+    let secciones = this.plantillaForm.get('secciones') as FormArray;
+    secciones.push(this.fb.group({
       nombre: ['', Validators.required],
       descripcion: ['', Validators.required],
-      subsecciones: this.fb.array([]),
-    });
-
-    const seccion = this.secciones.at(index) as FormGroup;
-    const subsecciones = seccion.get('subsecciones') as FormArray;
-    subsecciones.push(nuevaSeccion);
+      campos: this.fb.array([]),
+      direccion: ['', Validators.required],
+    }));
   }
 
-  eliminarSeccion(index: number) {
-    this.secciones.removeAt(index);
+  manejoSecciones(formSecciones: FormGroup) {
+    // console.log('Recibiendo secciones: ', formSecciones);
+    // const val = formSecciones.value;
+    // this.seccionesData = formSecciones;
+    // this.seccionesVista = val.secciones;
+    // console.log(this.seccionesVista);
   }
 
-  generarPlantilla(): void {
+  updateForm(newFormArray: FormArray): void {
+    this.plantillaForm.setControl('secciones', newFormArray);
+  }
+
+  guardarPlantilla(): void {
+    this.seccionesComponent.enviarSecciones();
+    console.log("seccionesData: ", this.seccionesData);
+  }
+
+
+  enviarPlantilla2(): void {
+    Swal.fire("SweetAlert2 is working!");
+  }
+  // ...
+
+  enviarPlantilla(): void {
     console.log('Generando plantilla: ', this.plantillaForm.value);
-    // plantilla enviada desde el componente de secciones
     const plantillaPost = this.plantillaForm.value;
-    this.postPlantilla(plantillaPost);
-  }
-
-  postPlantilla(plantillaPost: any) {
-    console.log('Posteando plantilla: ', plantillaPost);
     try {
       this.request.post(environment.PLANTILLAS_MID_SERVICE, 'plantilla', plantillaPost).subscribe((res) => {
         console.log("Respuesta: ", res);
@@ -107,15 +127,7 @@ export class CreacionPlantillaComponent implements OnInit {
     }
   }
 
-  crearPDF(content: any) {
-    const options = {
-      margin: 10,
-      filename: 'documento.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    };
-  }
+  // ! Asignación de valores a campos de plantilla debe corregirse
 
   llenarCampos(id: string): void {
     console.log('Llenando campos de plantilla de id: ', id);
@@ -124,15 +136,15 @@ export class CreacionPlantillaComponent implements OnInit {
         this.request
           .get(environment.PLANTILLAS_SERVICE, 'plantilla/' + id)
           .subscribe((res) => {
-            this.plantillaForm.setControl(
-              'nombre',
-              this.fb.control(res.data[0].nombre)
-            );
-            this.plantillaForm.get('tipo').setValue(res.data[0].tipo);
-            this.plantillaForm.setControl(
-              'descripcion',
-              this.fb.control(res.data[0].descripcion)
-            );
+            // this.plantillaForm.setControl(
+            //   'nombre',
+            //   this.fb.control(res.data[0].nombre)
+            // );
+            // this.plantillaForm.get('tipo').setValue(res.data[0].tipo);
+            // this.plantillaForm.setControl(
+            //   'descripcion',
+            //   this.fb.control(res.data[0].descripcion)
+            // );
           });
       } catch (error) {
         console.error('Error: ', error);
@@ -160,4 +172,81 @@ export class CreacionPlantillaComponent implements OnInit {
         }
       });
   }
+
+  generarPdf() {
+    // const data = document.createElement('div');
+    // data.innerHTML = this.elementoForm.nativeElement.innerHTML;
+    // data.style.marginTop = '50px';
+    // document.body.appendChild(data);
+    // const alturaForm = this.elementoForm.nativeElement.offsetHeight;
+    // console.log(this.elementoForm.nativeElement.offsetHeight);
+    // const data1 = this.elementoForm.nativeElement;
+    var elementHeight = this.elementoForm.nativeElement.offsetHeight;
+
+    const data1 = document.getElementById('elementoPlantilla');
+
+    const elements = document.querySelectorAll('.elementClass');
+    const doc = new jspdf('p', 'px', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    var actualY = 0;
+    // elements.forEach((element, index) => {
+    //   html2canvas(element as HTMLElement).then((canvas) => {
+    //     const image = canvas.toDataURL('image/jpeg', 1.0);
+
+    //     const widthRatio = pageWidth / canvas.width;
+    //     const heightRatio = pageHeight / canvas.height;
+    //     const ratio = widthRatio > heightRatio ? heightRatio : widthRatio;
+    //     const scale = 0.5;
+    //     const canvasWidth = canvas.width * ratio * scale;
+    //     const canvasHeight = canvas.height * ratio * scale
+    //     var marginX = 0;
+    //     var marginY = actualY + (pageHeight - canvasHeight) / 2;
+
+    //     doc.addImage(image, 'JPEG', marginX, marginY, canvasWidth, canvasHeight);
+
+    //     const remainingSpace = pageWidth - (marginX + canvasWidth);
+    //     const nextElementWidth = 100;
+    //     if (remainingSpace < nextElementWidth) {
+    //       marginX = 0;
+    //       marginY += canvasHeight;
+    //     } else {
+    //       marginX += canvasWidth;
+    //     }
+
+    //     if (index === elements.length - 1) {
+    //       doc.save('Plantilla.pdf');
+    //     }
+    //   });
+    //   actualY += 10;
+    // });
+    html2canvas(data1).then(canvas => {
+
+      const image = canvas.toDataURL('image/jpeg', 1.0);
+
+      const widthRatio = pageWidth / canvas.width;
+      const heightRatio = pageHeight / canvas.height;
+      const ratio = widthRatio > heightRatio ? heightRatio : widthRatio;
+
+      const canvasWidth = canvas.width * ratio * 1.5;
+      const canvasHeight = canvas.height * ratio * 1.5;
+
+      var marginX = 10;
+      var marginY = 10;
+
+      doc.addImage(image, 'JPEG', marginX, marginY, canvasWidth, canvasHeight);
+
+      const remainingSpace = pageWidth - (marginX + canvasWidth);
+      const nextElementWidth = 100;
+      if (remainingSpace < nextElementWidth) {
+        marginX = 10;
+        marginY += canvasHeight;
+      } else {
+        marginX += canvasWidth;
+      }
+
+      doc.save('new-file.pdf');
+    });
+  }
+
 }
