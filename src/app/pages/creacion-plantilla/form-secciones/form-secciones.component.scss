@@ -1,46 +1,160 @@
 @import "../creacion-plantilla.component.scss";
+@import "../../../../styles.scss";
 
 .row {
-    display: flex-start;
+    display: flex;
+    flex-direction: row;
 }
 
-.items {
-    display: flex-start;
+.col-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+}
+
+.sec-title {
+    text-align: center;
+    background-color: forestgreen;
+    color: aliceblue;
+}
+
+.panel-seccion {
+    border-color: #f5f5f5;
+    padding: 10px;
+    // box-shadow: 0 0.2rem 0.5rem 0 map-get($primary, 600);
+    border: 1px solid black;
+}
+
+.panel-info {
+    border: 1px solid black;
+    padding: 10px;
+    width: 30%;
+    justify-content: center;
+
+    mat-form-field {
+        padding: 0px;
+        margin: 0px;
+        width: 100%;
+    }
+}
+
+.panel-campos {
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+    border: 1px solid black;
+    text-align: center;
+}
+
+.bt-container {
+    margin: 5px;
+}
+
+.bt-column {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 30px;
-    width: 30px;
 }
 
-.secContent {
+.sec-button {
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: none;
+    color: map-get((map-get($primary, contrast)), 500);
+    background-color: map-get($primary, 500);
+}
+
+.sec-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 5px;
+    width: 100%;
+    border: 1px solid black;
+}
+
+.campo-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    textarea {
+        width: 90%;
+        flex-grow: 1;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+}
+
+.bt-campos {
+    display: flex;
     align-items: center;
     justify-content: center;
-    margin: 10px;
-    width: auto;
-    border: solid 1px black;
+    height: 20px;
+    border-top: 1px solid black;
 }
 
-.mat-delete {
-    color: map-get(map-get($primary, contrast), A200);
-    background-color: map-get($primary, A200);
+.opt-campos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+
+    input {
+        width: 15%;
+        max-width: 40px;
+        border-bottom: 1px solid black;
+    }
+
+    ;
+
+    mat-select {
+        width: 35%;
+        max-width: 90px;
+        border-bottom: 1px solid black;
+    }
+
 }
 
-.mat-item {
-    color: map-get(map-get($primary, contrast), 700);
-    background-color: map-get($primary, 700);
+.arr-bt-campo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: map-get($primary, A700);
+    background-color: transparent;
 }
 
-.mat-arrow {
-    margin: 10px;
-    color: map-get(map-get($primary, contrast), A700);
-    background-color: map-get($primary, A700);
+.del-bt-campo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: map-get($primary, A200);
+    background-color: transparent;
+}
+
+.del-icon {
+    color: map-get($primary, A200);
+    background-color: transparent;
+}
+
+.item-icon {
+    color: map-get($primary, A700);
+    background-color: transparent;
 }
 
 .delButton {
-    margin: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    color: map-get($primary, A200);
+}
+
+.sec-icon {
+    color: map-get($primary, 500);
+    background-color: transparent;
+
 }
 
 .small-button {

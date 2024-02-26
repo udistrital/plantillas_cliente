@@ -14,10 +14,9 @@
                     </mat-form-field>
                     <mat-form-field *ngIf="plantillaForm">
                         <mat-label>Tipo de plantilla</mat-label>
-                        <select matNativeControl formControlName="tipo">
-                            <option *ngFor="let tipo of tiposPlantilla" [value]="tipo">{{ tipo }}
-                            </option>
-                        </select>
+                        <mat-select formControlName="tipo">
+                            <mat-option *ngFor="let tipo of tiposPlantilla" [value]="tipo">{{ tipo }}</mat-option>
+                        </mat-select>
                     </mat-form-field>
                 </div>
                 <div style="width: 100%;">
@@ -25,8 +24,7 @@
                         Secciones
                     </div>
                     <!-- Componente de secciones (FormArray) -->
-                    <app-form-secciones [seccionesForm]="plantillaForm" formArrayName="secciones"
-                        (seccionesData)="updateForm($event)"></app-form-secciones>
+                    <app-form-secciones [seccionesForm]="plantillaForm"></app-form-secciones>
                     <!-- Agregar primera sección -->
                     <button mat-raised-button *ngIf="plantillaForm.get('secciones').value.length === 0"
                         class="sec-button" (click)="crearSeccion()" matTooltip="Agregar una sección">

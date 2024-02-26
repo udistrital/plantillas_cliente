@@ -21,48 +21,66 @@
               <mat-label>Descripción</mat-label>
               <textarea matInput formControlName="descripcion" rows="3"></textarea>
             </mat-form-field>
+            <mat-label>Disposición</mat-label>
             <mat-radio-group formControlName="direccion">
-              <mat-radio-button value="row" (change)="cambiarDireccion(i, $event)">Filas</mat-radio-button>
-              <mat-radio-button value="column" (change)="cambiarDireccion(i, $event)">Columnas</mat-radio-button>
+              <mat-radio-button value="row" (change)="cambiarDireccion(i, $event)">En fila</mat-radio-button>
+              <mat-radio-button value="column" (change)="cambiarDireccion(i, $event)">En columna</mat-radio-button>
             </mat-radio-group>
           </div>
           <!-- Campos de cada sección -->
           <div class="sec-content" [style.flex-direction]="seccion.controls.direccion.value"
             *ngIf="seccion.controls.campos" formArrayName="campos">
-            <div *ngFor="let campo of seccion.controls.campos.controls; let j = index">
-              <div class="panel-campos">
-                <!-- Si es FormGroup, lo toma como campo de texto -->
-                <div *ngIf="!esSubseccion(campo)" [formGroupName]="j">
-                  <pre>Contenido campoasdasfasfasg {{ j }}</pre>
+            <div class="panel-campos" *ngFor="let campo of seccion.controls.campos.controls; let j = index"
+              [style.width]="widthCampos(i)">
+              <!-- Si es FormGroup, lo toma como campo de texto -->
+              <div class="campo-content" *ngIf="!esSubseccion(campo)" [formGroupName]="j">
+                <div class="opt-campos">
+                  <mat-select placeholder="Fuente" formControlName="estiloFuente">
+                    <mat-option value="Arial">Arial</mat-option>
+                    <mat-option value="Verdana">Verdana</mat-option>
+                    <mat-option value="Helvetica">Helvetica</mat-option>
+                    <mat-option value="Times New Roman">Times New Roman</mat-option>
+                  </mat-select>
+                  <mat-icon>format_size</mat-icon>
+                  <input matInput type="number" formControlName="tamanoFuente">
+                  <mat-icon>format_bold</mat-icon>
+                  <mat-checkbox (change)="actualizarPeso($event,i,j)"></mat-checkbox>
+                  <mat-icon>format_italic</mat-icon>
+                  <mat-checkbox (change)="actualizarEstilo($event,i,j)"></mat-checkbox>
                 </div>
-                <!-- Si es FormArray, lo toma como subsección -->
-                <div *ngIf="esSubseccion(campo)" [formArrayName]="j">
-                  <pre>Subsección {{ j }}</pre>
-                </div>
-                <div class="bt-campos">
-                  <button mat-icon-button class="arr-bt-campo" (click)="intercambioCampo(i,j,j-1)"
+                <textarea formControlName="dataString" [ngStyle]="getStyle(i,j)"></textarea>
+              </div>
+              <!-- Si es FormArray, lo toma como subsección -->
+              <div *ngIf="esSubseccion(campo)" [formGroupName]="j">
+                <app-form-secciones [seccionesForm]="campo"></app-form-secciones>
+              </div>
+              <div class="bt-campos">
+                <button *ngIf="!esSubseccion(campo)" mat-icon-button matTooltip="Agregar un campo dinámico">
+                  <mat-icon [ngStyle]="iconStyles">input</mat-icon>
+                </button>
+                <button mat-icon-button class="arr-bt-campo" (click)="intercambioCampo(i,j,j-1)"
                   matTooltip="Disminuir una posición">
                   <mat-icon>keyboard_arrow_left</mat-icon>
                 </button>
-                  <button mat-icon-button class="arr-bt-campo" (click)="intercambioCampo(i,j,j+1)"
-                    matTooltip="Incrementar una posición">
-                    <mat-icon>keyboard_arrow_right</mat-icon>
-                  </button>
-                  <button mat-icon-button class="del-bt-campo" (click)="eliminarCampo(i,j)"
-                    matTooltip="Eliminar este campo">
-                    <mat-icon>delete_forever</mat-icon>
-                  </button>
-                </div>
+                {{ j }}
+                <button mat-icon-button class="arr-bt-campo" (click)="intercambioCampo(i,j,j+1)"
+                  matTooltip="Incrementar una posición">
+                  <mat-icon>keyboard_arrow_right</mat-icon>
+                </button>
+                <button mat-icon-button class="del-bt-campo" (click)="eliminarCampo(i,j)"
+                  matTooltip="Eliminar este campo">
+                  <mat-icon>delete_forever</mat-icon>
+                </button>
               </div>
             </div>
           </div>
           <div class="bt-column">
             <button mat-icon-button class="item-icon" (click)="intercambioSeccion(i,i-1)"
-              matTooltip="Incrementar una posición">
+              matTooltip="Disminuir una posición">
               <mat-icon [ngStyle]="iconStyles">arrow_upward</mat-icon>
             </button>
             <button mat-icon-button class="item-icon" (click)="intercambioSeccion(i,i+1)"
-              matTooltip="Disminuir una posición">
+              matTooltip="Incrementar una posición">
               <mat-icon [ngStyle]="iconStyles">arrow_downward</mat-icon>
             </button>
             <button mat-icon-button class="del-icon" (click)="eliminarSeccion(i)" matTooltip="Eliminar esta sección">
@@ -75,9 +93,6 @@
           <div style="margin-left: 10px;"> <!-- ! Usar una clase y agregar condicion index 0 -->
             <button mat-icon-button (click)="agregarCampo(i)" matTooltip="Agregar campo de texto">
               <mat-icon [ngStyle]="iconStyles">text_fields</mat-icon>
-            </button>
-            <button mat-icon-button matTooltip="Agregar un campo dinámico">
-              <mat-icon [ngStyle]="iconStyles">short_text</mat-icon>
             </button>
             <button mat-icon-button matTooltip="Agregar una imagen">
               <mat-icon [ngStyle]="iconStyles">add_photo_alternate</mat-icon>
@@ -98,92 +113,3 @@
     </div>
   </div>
 </div>
-
-<!-- ! Cambiar esto -->
-
-<!-- <form style="width: 100%" [formGroup]="seccionesForm">
-  <div class="panel">
-    <div formArrayName="secciones">
-      <div *ngFor="let seccion of listaSecciones.controls; let i = index" ngModelGroup="i">
-        <div *ngIf="esSubseccion(i)">
-
-
-          Contenido de la sección
-          <div class="secContent">
-            <center>Contenido</center>
-            Texto
-            <div style="width: 100%;" *ngFor="let campo of seccion.get('campos').controls; let j = index"
-              ngModelGroup="j">
-              <div *ngIf="camposImagen[j] == 1">
-                <div class="row">
-                  <div style="width: 70%; margin: 10px;">
-                    <textarea [(ngModel)]="textAreaContent[j]" #textareaRef [ngModelOptions]="{standalone: true}"
-                      style="width: 100%;" [style.fontSize.px]="tamanosFuente[j]" [style.fontFamily]="estilosFUente[j]"
-                      [style.fontStyle]="fontstyle[j]" [style.fontWeight]="negrita[j]" rows="4"></textarea>
-                  </div>
-                  <div style="width: 30%;">
-                    <div class="row">
-                      <button mat-icon-button (click)="insertarCampo(j)" matTooltip="campo dinámico (cursor)"
-                        style="width: 15%;">
-                        <mat-icon
-                          [ngStyle]="{'line-height': iconSizes, 'font-size': iconSizes, 'width': iconSizes, 'height': iconSizes}">input</mat-icon>
-                      </button>
-                      <mat-form-field style="width: 50%; margin-right: 10px;">
-                        <mat-label>Fuente</mat-label>
-                        <mat-select formControlName="estiloFuente" (selectionChange)="actualizarFuente($event, j)">
-                          <mat-option value="Arial">Arial</mat-option>
-                          <mat-option value="Verdana">Verdana</mat-option>
-                          <mat-option value="Helvetica">Helvetica</mat-option>
-                          <mat-option value="Times New Roman">Times New Roman</mat-option>
-                        </mat-select>
-                      </mat-form-field>
-                      <mat-checkbox formControlName="negrita" style="width: 35%;"
-                        (change)="actualizarPeso($event, j)">Negrita</mat-checkbox>
-                    </div>
-                    <div class="row" style="width: 100%;">
-                      <button mat-icon-button class="delButton" (click)="eliminarCampo(i,j)"
-                        matTooltip="eliminar este campo" style="width: 15%;">
-                        <mat-icon
-                          [ngStyle]="{'line-height': iconSizes, 'font-size': iconSizes, 'width': iconSizes, 'height': iconSizes}">clear</mat-icon>
-                      </button>
-                      <mat-form-field style="width: 50%; margin-right: 10px;">
-                        <mat-label>Tamaño (px)</mat-label>
-                        <input matInput type="number" (change)="actualizarTamano($event, j)"
-                          formControlName="tamanoFuente">
-                      </mat-form-field>
-                      <mat-checkbox formControlName="cursiva" style="width: 35%;"
-                        (change)="actualizarEstilo($event, j)">Cursiva</mat-checkbox>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div *ngIf="camposImagen[j]==2">
-                Imagen
-                <div class="row" style="margin: 10px;">
-                  <input type="file" (change)="onselectFile($event)">
-                  <img [src]="imagenUrls[j]" width="100" style="margin-left: 10px; margin-right: 10px;">
-                  <button mat-icon-button (click)="eliminarCampo(i,j)" matTooltip="eliminar este campo">
-                    <mat-icon
-                      [ngStyle]="{'line-height': iconSizes, 'font-size': iconSizes, 'width': iconSizes, 'height': iconSizes}">clear</mat-icon>
-                  </button>
-                </div>
-              </div>
-            </div>
-            Secciones
-            <div class="row panel2">
-              <div style="width: 100%;">
-                Secciones
-                <app-form-secciones [seccionesForm]="seccion" [nivel]="calcularNivel(i, nivel)"></app-form-secciones>
-              </div>
-            </div>
-          </div>
-          Botones de la sección
-          Eliminar sección
-          <div *ngIf="esSubseccion(i)" style="margin-left: 10px; margin-right: 10px;">
-            
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</form> -->

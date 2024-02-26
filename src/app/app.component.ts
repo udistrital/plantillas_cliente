@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { environment } from 'environments/environment';
+import { environment } from '../environments/environment';
 import { Router, NavigationEnd } from '@angular/router';
 import { UserService } from './pages/services/userService';
 declare let gtag: Function;

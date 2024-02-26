@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RouteConfigLoadEnd, RouteConfigLoadStart, Router } from '@angular/router';
-import { environment } from 'environments/environment';
+import { environment } from '../../environments/environment';
 import Swal from 'sweetalert2';
 import { UserService } from './services/userService';
 import { RequestManager } from './services/requestManager';

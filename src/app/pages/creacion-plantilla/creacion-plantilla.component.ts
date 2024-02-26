@@ -13,6 +13,7 @@ import { Respuesta } from 'src/app/@core/models/respuesta';
 import jspdf from 'jspdf';
 import html2canvas from 'html2canvas';
 import Swal from 'sweetalert2';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -40,6 +41,8 @@ export class CreacionPlantillaComponent implements OnInit {
 
   seccionesVista = [];
 
+  private subscription: Subscription;
+
   constructor(
     private request: RequestManager,
     private popUp: UtilService,
@@ -57,6 +60,10 @@ export class CreacionPlantillaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.subscription =  this.plantillaForm.valueChanges.subscribe((value) => {
+      this.cdr.detectChanges();
+    });
 
     this.route.params.subscribe((params) => {
       if (params['id']) {
@@ -76,6 +83,10 @@ export class CreacionPlantillaComponent implements OnInit {
 
   ngAfterViewInit() {
     console.log("ngAfterViewInit");
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   // TODO: Agregar secciones
@@ -100,12 +111,8 @@ export class CreacionPlantillaComponent implements OnInit {
     // console.log(this.seccionesVista);
   }
 
-  updateForm(newFormArray: FormArray): void {
-    this.plantillaForm.setControl('secciones', newFormArray);
-  }
-
   guardarPlantilla(): void {
-    this.seccionesComponent.enviarSecciones();
+    // this.seccionesComponent.enviarSecciones();
     console.log("seccionesData: ", this.seccionesData);
   }
 
