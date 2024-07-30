@@ -32,6 +32,9 @@ import { CreacionPlantillaComponent } from './creacion-plantilla/creacion-planti
 import { VistaPlantillasComponent } from './vista-plantillas/vista-plantillas.component';
 import { Ng2SmartTableModule } from 'ng2-smart-table';
 import { FormSeccionesComponent } from './creacion-plantilla/form-secciones/form-secciones.component';
+import { SeccionDialogComponent } from './creacion-plantilla/seccion-dialog/seccion-dialog.component';
+import { CampoDialogComponent } from './creacion-plantilla/campo-dialog/campo-dialog.component';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 
 const pagesComponents = [
@@ -64,6 +67,8 @@ const materialModules = [
     VistaPlantillasComponent,
     CreacionPlantillaComponent,
     FormSeccionesComponent,
+    SeccionDialogComponent,
+    CampoDialogComponent,
   ],
   imports: [
     ...materialModules,
@@ -74,6 +79,7 @@ const materialModules = [
     PagesRoutingModule,
     MatDialogModule,
     Ng2SmartTableModule,
+    OverlayModule
   ],
   providers: [
     MatDatepickerModule,

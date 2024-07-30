@@ -10,31 +10,15 @@
             Sección # {{ i }} Nivel {{ nivel }}
           </div>
         </div>
-        <!-- Info de la seccion -->
         <div class="row">
-          <div class="panel-info">
-            <mat-form-field> <!-- ! Usar una clase -->
-              <mat-label>Nombre de la sección</mat-label>
-              <input matInput formControlName="nombre" />
-            </mat-form-field>
-            <mat-form-field> <!-- ! Usar una clase -->
-              <mat-label>Descripción</mat-label>
-              <textarea matInput formControlName="descripcion" rows="3"></textarea>
-            </mat-form-field>
-            <mat-label>Disposición</mat-label>
-            <mat-radio-group formControlName="direccion">
-              <mat-radio-button value="row" (change)="cambiarDireccion(i, $event)">En fila</mat-radio-button>
-              <mat-radio-button value="column" (change)="cambiarDireccion(i, $event)">En columna</mat-radio-button>
-            </mat-radio-group>
-          </div>
           <!-- Campos de cada sección -->
           <div class="sec-content" [style.flex-direction]="seccion.controls.direccion.value"
             *ngIf="seccion.controls.campos" formArrayName="campos">
-            <div class="panel-campos" *ngFor="let campo of seccion.controls.campos.controls; let j = index"
-              [style.width]="widthCampos(i)">
+            <div class="panel-campos" *ngFor="let campo of seccion.controls.campos.controls; let j = index">
+              <!-- [style.width]="widthCampos(i)"> -->
               <!-- Si es FormGroup, lo toma como campo de texto -->
               <div class="campo-content" *ngIf="!esSubseccion(campo)" [formGroupName]="j">
-                <div class="opt-campos">
+                <!-- <div class="opt-campos">
                   <mat-select placeholder="Fuente" formControlName="estiloFuente">
                     <mat-option value="Arial">Arial</mat-option>
                     <mat-option value="Verdana">Verdana</mat-option>
@@ -47,11 +31,14 @@
                   <mat-checkbox (change)="actualizarPeso($event,i,j)"></mat-checkbox>
                   <mat-icon>format_italic</mat-icon>
                   <mat-checkbox (change)="actualizarEstilo($event,i,j)"></mat-checkbox>
-                </div>
+                </div> -->
                 <textarea formControlName="dataString" [ngStyle]="getStyle(i,j)"></textarea>
+                <button mat-icon-button class="item-icon" (click)="openCampoDialog(i,j)" matTooltip="Administrar campo">
+                  <mat-icon [ngStyle]="iconStyles">edit</mat-icon>
+                </button>
               </div>
               <!-- Si es FormArray, lo toma como subsección -->
-              <div *ngIf="esSubseccion(campo)" [formGroupName]="j">
+              <div class="campo-content" *ngIf="esSubseccion(campo)" [formGroupName]="j">
                 <app-form-secciones [seccionesForm]="campo"></app-form-secciones>
               </div>
               <div class="bt-campos">
@@ -75,6 +62,10 @@
             </div>
           </div>
           <div class="bt-column">
+            <!-- Editar info de la seccion -->
+            <button mat-icon-button class="item-icon" (click)="openSeccionDialog(i)" matTooltip="Administrar sección">
+              <mat-icon [ngStyle]="iconStyles">edit</mat-icon>
+            </button>
             <button mat-icon-button class="item-icon" (click)="intercambioSeccion(i,i-1)"
               matTooltip="Disminuir una posición">
               <mat-icon [ngStyle]="iconStyles">arrow_upward</mat-icon>

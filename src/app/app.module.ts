@@ -10,9 +10,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RequestManager } from './pages/services/requestManager';
 import { UtilService } from './pages/services/utilService';
 import { UserService } from './pages/services/userService';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ServiceWorkerModule } from "@angular/service-worker";
 import { environment } from '../environments/environment';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,8 @@ import { environment } from '../environments/environment';
     AppRoutingModule,
     HttpClientModule,
     BrowserAnimationsModule,
+    MatDialogModule,
+    OverlayModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
   providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }, RequestManager, UtilService, UserService, MatDialog],

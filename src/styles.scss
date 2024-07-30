@@ -1,5 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-@import url("https://pruebasassets.portaloas.udistrital.edu.co/urano-style.css");
+@import url("https://pruebasassets.portaloas.udistrital.edu.co/athenea-style.css");
 @import url("https://pruebasassets.portaloas.udistrital.edu.co/oas.css");
 @import "~@angular/material/theming";
 // @import '~ngx-toastr/toastr';
@@ -9,20 +9,20 @@
 // material customize
 
 $primary: (
-  50: var(--primary),
-  100: var(--primary),
-  200: var(--primary),
-  300: var(--primary),
-  400: var(--primary),
-  500: var(--primary),
-  600: var(--primary),
-  700: var(--primary),
-  800: var(--primary),
-  900: var(--primary),
-  A100: var(--primary),
-  A200: var(--primary),
-  A400: var(--primary),
-  A700: var(--primary),
+  50: #EDF7E7,
+  100: #D4E9C5,
+  200: #C1DBAF,
+  300: #AECC99,
+  400: #9BBE84,
+  500: #397A18,
+  600: #71A059,
+  700: #629545,
+  800: #88B06E,
+  900: #4E8730,
+  A100: #FFB051,
+  A200: #B03D3F,
+  A400: #02681D,
+  A700: #4867A3,
   contrast: (
     50: white,
     100: white,
@@ -201,7 +201,7 @@ a {
 .item-list-important {
   display: flex;
   flex-wrap: nowrap;
-  justify-content: start;
+  justify-content: flex-start;
   align-items: center;
   text-align: justify;
   font-family: "Open Sans";

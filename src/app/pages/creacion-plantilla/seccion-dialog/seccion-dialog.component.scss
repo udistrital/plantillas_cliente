@@ -1,0 +1,21 @@
+@import "../../../../styles.scss";
+
+.titulo {
+    margin-top: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    color: map-get($primary, 500);
+}
+
+.panel-info {
+    border: 1px solid black;
+    padding: 10px;
+    justify-content: center;
+
+    mat-form-field {
+        padding: 0px;
+        margin: 0px;
+        width: 100%;
+    }
+}

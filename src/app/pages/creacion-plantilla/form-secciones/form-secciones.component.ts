@@ -11,6 +11,9 @@ import {
   forwardRef,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { SeccionDialogComponent } from '../seccion-dialog/seccion-dialog.component';
+import { CampoDialogComponent } from '../campo-dialog/campo-dialog.component';
 
 @Component({
   selector: 'app-form-secciones',
@@ -60,7 +63,7 @@ export class FormSeccionesComponent implements ControlValueAccessor, OnInit {
 
   private disabledButtons: boolean[] = [];
 
-  constructor(private fb: FormBuilder, private cdr: ChangeDetectorRef) {
+  constructor(public dialog: MatDialog, private fb: FormBuilder, private cdr: ChangeDetectorRef) {
 
   }
 
@@ -145,7 +148,7 @@ export class FormSeccionesComponent implements ControlValueAccessor, OnInit {
     if (direccion == 'column') {
       return '100%';
     } else {
-      return '25%';
+      return 'auto';
     }
   }
 
@@ -260,6 +263,46 @@ export class FormSeccionesComponent implements ControlValueAccessor, OnInit {
     // this.textAreaContent[j] = this.textAreaContent[j].substring(0, startPos) + text + this.textAreaContent[j].substring(endPos, this.textAreaContent[j].length);
     // textArea.selectionStart = startPos + text.length;
     // textArea.selectionEnd = startPos + text.length;
+  }
+
+  openSeccionDialog(i): void {
+    const seccion = (this.seccionesForm.get('secciones') as FormArray).at(i) as FormGroup;
+    const dialogRef = this.dialog.open(SeccionDialogComponent, {
+      width: '450px',
+      data: { text: "Texto" }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed, updating form values...');
+      if (result != undefined) {
+        seccion.get('nombre').setValue(result.nombre);
+        seccion.get('descripcion').setValue(result.descripcion);
+        seccion.get('direccion').setValue(result.direccion);
+      }
+    })
+  }
+
+  openCampoDialog(i, j): void {
+    const seccion = (this.seccionesForm.get('secciones') as FormArray).at(i) as FormGroup;
+    const campo = (seccion.get('campos') as FormArray).at(j) as FormGroup;
+    const dialogRef = this.dialog.open(CampoDialogComponent, {
+      width: '350px',
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed, updating form values...');
+      if (result != undefined) {
+        campo.get('nombre').setValue(result.nombre);
+        // campo.get('dataString').setValue(result.dataString);
+        // campo.get('dataBinary').setValue(result.dataBinary);
+        campo.get('estiloFuente').setValue(result.estiloFuente);
+        campo.get('tamanoFuente').setValue(result.tamanoFuente);
+        campo.get('negrita').setValue(result.negrita ? 'bold' : 'normal');
+        campo.get('cursiva').setValue(result.cursiva ? 'italic' : 'normal');
+      }
+    })
+
   }
 
   get listaSecciones() {

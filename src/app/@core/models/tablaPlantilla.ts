@@ -37,5 +37,10 @@ export const TablaPlantilla: any = {
     width: '10%',
     editable: false,
     filter: true,
+  },
+  acciones: {
+    title: 'Acciones',
+    type: 'custom',
+    renderComponent: null,
   }
 };
