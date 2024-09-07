@@ -8,25 +8,23 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root',
 })
 export class UserService {
-    private userSubject = new BehaviorSubject({});
-    public user$ = this.userSubject.asObservable();
+  private userSubject = new BehaviorSubject({});
+  public user$ = this.userSubject.asObservable();
 
-    private terceroSubject = new BehaviorSubject({});
-    public tercero$ = this.terceroSubject.asObservable();
-    public terceroData: any = {}
+  private terceroSubject = new BehaviorSubject({});
+  public tercero$ = this.terceroSubject.asObservable();
+  public terceroData: any = {};
 
-    constructor() {}
+  constructor() {}
 
-    updateUser(dataUser) {
-        this.userSubject.next(dataUser);
-    }
+  updateUser(dataUser) {
+    this.userSubject.next(dataUser);
+  }
 
-    updateTercero(data) {
-      this.terceroData = {...this.terceroData, ...data}
-      this.terceroSubject.next(this.terceroData);
-    }
+  updateTercero(data) {
+    this.terceroData = { ...this.terceroData, ...data };
+    this.terceroSubject.next(this.terceroData);
+  }
 
-    getAllTercero(){
-      
-    }
+  getAllTercero() {}
 }

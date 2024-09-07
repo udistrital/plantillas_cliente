@@ -5,35 +5,22 @@ import { PagesComponent } from './pages.component';
 import { VistaPlantillasComponent } from './vista-plantillas/vista-plantillas.component';
 import { CreacionPlantillaComponent } from './creacion-plantilla/creacion-plantilla.component';
 
-const routes: Routes = [{
-  path: '',
-  component: PagesComponent,
-  children: [
-    {
-      path: 'dashboard',
-      component: DashboardComponent,
-    },
-    {
-      path: '', redirectTo: 'dashboard', pathMatch: 'full',
-    },
-    {
-      path: 'vista_plantillas',
-      component: VistaPlantillasComponent,
-    },
-    {
-      path: 'creacion_plantilla/:id',
-      component: CreacionPlantillaComponent,
-    },
-    {
-      path: 'creacion_plantilla',
-      component: CreacionPlantillaComponent,
-    }
-  ]
-
-}]
+const routes: Routes = [
+  {
+    path: '',
+    component: PagesComponent,
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'creacion_plantilla', component: CreacionPlantillaComponent },
+      { path: 'creacion_plantilla/:id', component: CreacionPlantillaComponent },
+      { path: 'vista_plantillas', component: VistaPlantillasComponent },
+    ],
+  },
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class PagesRoutingModule { }
+export class PagesRoutingModule {}

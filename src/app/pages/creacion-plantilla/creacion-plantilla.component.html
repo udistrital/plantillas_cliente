@@ -1,12 +1,10 @@
 <mat-card class="mat-card-margin">
-    <mat-card-title class="plantillas-title">
-        Generar plantillas
-    </mat-card-title>
+    <mat-card-title class="plantillas-title">Generar plantillas</mat-card-title>
+
     <mat-card-content>
         <form [formGroup]="plantillaForm">
-            <div class="form-row" style="border: 1px solid #000;"></div>
-            <br>
             <div class="panel">
+
                 <div class="infoGeneral">
                     <mat-form-field *ngIf="plantillaForm">
                         <mat-label>Nombre de la plantilla</mat-label>
@@ -19,69 +17,26 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
+
                 <div style="width: 100%;">
-                    <div class="titulo">
-                        Secciones
-                    </div>
-                    <!-- Componente de secciones (FormArray) -->
-                    <app-form-secciones [seccionesForm]="plantillaForm"></app-form-secciones>
-                    <!-- Agregar primera sección -->
-                    <button mat-raised-button *ngIf="plantillaForm.get('secciones').value.length === 0"
-                        class="sec-button" (click)="crearSeccion()" matTooltip="Agregar una sección">
-                        <mat-icon [ngStyle]="iconStyles">library_add</mat-icon>
-                    </button>
+                    <div class="titulo">Editor</div>
                 </div>
             </div>
+
             <div class="row">
-                <button mat-raised-button class="send" type="button" (click)="guardarPlantilla()">
+                <button mat-raised-button type="button" (click)="guardarPlantilla()">
                     Guardar plantilla
                 </button>
-                <button mat-raised-button class="pdf" type="button" (click)="generarPdf()" [disabled]="sendDisabled">
+                <button mat-raised-button type="button" (click)="generarPdf()" [disabled]="sendDisabled">
                     Generar pdf
                 </button>
-                <button mat-raised-button class="send" type="button" (click)="enviarPlantilla2()"
-                    [disabled]="sendDisabled">
+                <button mat-raised-button type="button" (click)="registrarPlantilla()" [disabled]="sendDisabled">
                     Registrar plantilla
                 </button>
             </div>
+
         </form>
     </mat-card-content>
 </mat-card>
 
 <pre> {{ plantillaForm.value | json }} </pre>
-
-<!-- <div id="elementoPlantilla">
-    <h1></h1>
-    <p></p>
-    <table>
-        <thead>
-            <tr>
-                <th>Campos</th>
-                <th>Sección</th>
-                <th>Descripción</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let seccion of seccionesVista; let i = index" style="margin: 10px;">
-                <td>
-                    <ul>
-                        <li *ngFor="let campo of seccion.campos; let j = index">
-                            <div id="contenidoPlantilla">
-                                <div class="elementClass" *ngIf="campo.dataBinary != ''">
-                                    <img [src]="campo.dataBinary" style="width: 100px; height: 100px;">
-                                </div>
-                                <div style="margin: 10px;" class="elementClass" *ngIf="campo.dataBinary == ''"
-                                    [style.fontSize.px]="campo.tamanoFuente" [style.fontFamily]="campo.estiloFuente"
-                                    [style.fontWeight]="campo.negrita" [style.fontStyle]="campo.cursiva">
-                                    {{ campo.dataString }}
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </td>
-                <td>{{ seccion.nombre }}</td>
-                <td>{{ seccion.descripcion }}</td>
-            </tr>
-        </tbody>
-    </table>
-</div> -->
