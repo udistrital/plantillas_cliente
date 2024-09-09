@@ -38,6 +38,7 @@ import { CreacionPlantillaComponent } from './creacion-plantilla/creacion-planti
 import { VistaPlantillasComponent } from './vista-plantillas/vista-plantillas.component';
 import { Ng2SmartTableModule } from 'ng2-smart-table';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { EditorModule } from '@tinymce/tinymce-angular';
 
 const pagesComponents = [DashboardComponent, PagesComponent];
 
@@ -76,6 +77,7 @@ const materialModules = [
     MatDialogModule,
     Ng2SmartTableModule,
     OverlayModule,
+    EditorModule,
   ],
   providers: [
     MatDatepickerModule,

@@ -16,19 +16,36 @@ import { Plantilla } from 'src/app/@core/models/plantilla';
 import { Respuesta } from 'src/app/@core/models/respuesta';
 import Swal from 'sweetalert2';
 import { Subscription } from 'rxjs';
+import { EditorComponent, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
 
 @Component({
   selector: 'app-creacion-plantilla',
   templateUrl: './creacion-plantilla.component.html',
   styleUrls: ['./creacion-plantilla.component.scss'],
+  providers: [
+    { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' },
+  ],
 })
 export class CreacionPlantillaComponent implements OnInit {
-  @ViewChild('formularioP') elementoForm: ElementRef;
-
   plantillaForm: FormGroup;
   tiposPlantilla = [];
   sendDisabled: boolean = true;
   private subscription: Subscription;
+  editor: EditorComponent['init'] = {
+    suffix: '.min',
+    base_url: '/tinymce',
+    language_url: '/assets/tinymce/langs/es_MX.js',
+    language: 'es_MX',
+    menubar: false,
+    statusbar: false,
+    plugins:
+      'autolink charmap directionality emoticons image insertdatetime link lists advlist preview searchreplace table wordcount',
+    toolbar: `undo redo | styles forecolor | bold italic | align numlist bullist
+      | outdent indent | link image | table tabledelete | tableprops tablerowprops tablecellprops | charmap emoticons | ltr rtl | insertdatetime | searchreplace wordcount | preview`,
+    toolbar_mode: 'sliding',
+    file_picker_types: 'image',
+    file_picker_callback: this.cargarImagen.bind(this),
+  };
 
   constructor(
     private request: RequestManager,
@@ -42,6 +59,7 @@ export class CreacionPlantillaComponent implements OnInit {
     this.plantillaForm = this.fb.group({
       nombre: ['', Validators.required],
       tipo: ['', Validators.required],
+      contenido: ['', Validators.required],
     });
   }
 
@@ -69,6 +87,25 @@ export class CreacionPlantillaComponent implements OnInit {
     this.subscription.unsubscribe();
   }
 
+  cargarImagen(callback: any, value: any, meta: any) {
+    // Crear input para seleccionar archivos
+    const input: any = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+
+    // INsertar el archivo en el editor
+    input.onchange = function () {
+      const file = input.files[0];
+      const reader: any = new FileReader();
+      reader.onload = function (e: any) {
+        const base64 = reader.result.toString();
+        callback(base64, { alt: file.name });
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click(); // Disparar el input
+  }
+
   guardarPlantilla(): void {
     console.log('guardarPlantilla');
   }
@@ -78,10 +115,10 @@ export class CreacionPlantillaComponent implements OnInit {
   }
 
   setPlantilla(id: string): void {
-    console.log('Llenando campos de plantilla de id: ', id);
+    console.log('setPlantilla: ', id);
   }
 
   generarPdf() {
-    console.log('Generar PDF');
+    console.log('generarPdf');
   }
 }

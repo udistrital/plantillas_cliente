@@ -15,17 +15,8 @@
   box-shadow: 0 0.1rem 0.2rem 0 map-get($primary, 400);
 }
 
-.infoGeneral {
-  mat-form-field {
-    margin: 10px;
-  }
-}
-
-.titulo {
-  font-size: 24px;
-  font-weight: bold;
-  text-align: center;
-  color: forestgreen;
+mat-form-field {
+  margin: 10px;
 }
 
 .row {
