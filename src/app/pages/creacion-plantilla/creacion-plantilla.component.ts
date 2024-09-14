@@ -20,10 +20,12 @@ import { EditorComponent, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
     { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' },
   ],
 })
+
 export class CreacionPlantillaComponent implements OnInit {
   plantillaForm: FormGroup;
-  tiposPlantilla = [];
-  sendDisabled: boolean = true;
+  tiposPlantilla: string[] = ['Contrato', 'Acta de inicio', 'Informe', 'Novedad'];
+  sistemas: string[] = ['SISGPLAN', 'SGA', 'POLUX'];
+  campos_dinamicos: string[] = [];
 
   private subscription: Subscription;
 
@@ -34,50 +36,12 @@ export class CreacionPlantillaComponent implements OnInit {
     language: 'es_MX',
     menubar: false,
     statusbar: false,
-    plugins:
-      'autolink charmap directionality emoticons image insertdatetime link lists advlist preview searchreplace table wordcount',
-    toolbar: `campoDinamico undo redo | styles forecolor | bold italic | align numlist bullist
-      | outdent indent | link image | table tabledelete | tableprops tablerowprops tablecellprops | charmap emoticons | ltr rtl | insertdatetime | searchreplace wordcount | preview`,
+    plugins: 'autolink charmap directionality emoticons image insertdatetime link lists advlist preview searchreplace table wordcount',
+    toolbar: `undo redo | styles forecolor | bold italic | align numlist bullist | outdent indent | campoDinamico | link image | table tabledelete | tableprops tablerowprops tablecellprops | charmap emoticons | ltr rtl | insertdatetime | searchreplace wordcount | preview`,
     toolbar_mode: 'sliding',
     file_picker_types: 'image',
-    file_picker_callback: this.cargarImagen.bind(this),
-    setup: (editor: any) => {
-      editor.ui.registry.addButton('campoDinamico', {
-        text: 'Insertar Campo Dinámico',
-        onAction: () => {
-          editor.windowManager.open({
-            title: 'Agregar Campo Dinámico',
-            body: {
-              type: 'panel',
-              items: [
-                {
-                  type: 'input',
-                  name: 'campo_dinamico',
-                  label: 'Nombre del Campo'
-                }
-              ]
-            },
-            buttons: [
-              {
-                type: 'cancel',
-                text: 'Cancelar'
-              },
-              {
-                type: 'submit',
-                text: 'Insertar',
-                primary: true,
-              }
-            ],
-            onSubmit: (api) => {
-              const data = api.getData();
-              const content = `<span contenteditable="false" class="dynamic-field" style="display: inline-block; padding: 5px; border: 1px solid #ccc;">{{${data.campo_dinamico}}}</span>`;
-              editor.insertContent(content);
-              api.close();
-            }
-          });
-        }
-      });
-    }
+    // file_picker_callback: this.cargarImagen.bind(this),
+    setup: this.configurarEditor.bind(this)
   };
 
   constructor(
@@ -92,6 +56,7 @@ export class CreacionPlantillaComponent implements OnInit {
     this.plantillaForm = this.fb.group({
       nombre: ['', Validators.required],
       tipo: ['', Validators.required],
+      sistema: ['', Validators.required],
       contenido: ['', Validators.required],
     });
   }
@@ -108,12 +73,6 @@ export class CreacionPlantillaComponent implements OnInit {
         console.log('Creación de plantilla');
       }
     });
-
-    this.tiposPlantilla = ['Contrato', 'Acta de inicio', 'Informe', 'Novedad'];
-  }
-
-  ngAfterViewInit() {
-    console.log('ngAfterViewInit');
   }
 
   ngOnDestroy() {
@@ -126,7 +85,7 @@ export class CreacionPlantillaComponent implements OnInit {
     input.setAttribute('type', 'file');
     input.setAttribute('accept', 'image/*');
 
-    // INsertar el archivo en el editor
+    // Insertar el archivo en el editor
     input.onchange = function () {
       const file = input.files[0];
       const reader: any = new FileReader();
@@ -139,11 +98,61 @@ export class CreacionPlantillaComponent implements OnInit {
     input.click(); // Disparar el input
   }
 
+  configurarEditor(editor: any) {
+    editor.ui.registry.addButton('campoDinamico', {
+      // text: 'Insertar Campo Dinámico',
+      icon: 'comment-add',
+      tooltip: 'Insertar Campo Dinámico',
+      onAction: () => this.abrirDialogoCampoDinamico(editor)
+    });
+
+    editor.on('input', () => this.actualizarCamposDinamicos(editor.getContent()))
+  }
+
+  abrirDialogoCampoDinamico(editor: any) {
+    editor.windowManager.open({
+      title: 'Agregar campo dinámico',
+      body: {
+        type: 'panel',
+        items: [{ type: 'input', name: 'campo_dinamico', label: 'Nombre del campo' }]
+      },
+      buttons: [
+        { type: 'cancel', text: 'Cancelar' },
+        { type: 'submit', text: 'Guardar', primary: true }
+      ],
+      onSubmit: (api: any) => {
+        const data = api.getData();
+        const content = `<span contenteditable="false" class="dynamic-field" style="display: inline-block; padding: 5px; border: 1px solid #ccc;" data-contenteditable="false">{{${data.campo_dinamico}}}</span>`;
+        editor.insertContent(content);
+        this.campos_dinamicos.push(data.campo_dinamico);
+        api.close();
+      }
+    });
+  }
+
+  actualizarCamposDinamicos(content: string): void {
+    // Crear un documento a partir del contenido actual del editor
+    const doc = new DOMParser().parseFromString(content, 'text/html');
+
+    // Obtener los campos dinámicos que todavía están en el contenido del editor
+    const camposActuales: string[] = [];
+    doc.querySelectorAll('span.dynamic-field').forEach(span => {
+      const campoDinamico = span.textContent.trim().replace('{{', '').replace('}}', '');
+      camposActuales.push(campoDinamico);
+    });
+
+    // Filtrar los campos dinámicos eliminados
+    this.campos_dinamicos = this.campos_dinamicos.filter(campo => camposActuales.includes(campo));
+  }
+
+  setPlantilla(id: string): void {
+    console.log('setPlantilla: ', id);
+  }
+
   guardarPlantilla(): void {
     const content = this.plantillaForm.value.contenido;
-    console.log("-" + content + "-");
 
-    // Procesa el contenido para eliminar el `span` y solo dejar el `{{fieldName}}`
+    // Crear un documento a partir del contenido actual del editor
     const doc = new DOMParser().parseFromString(content, 'text/html');
 
     // Reemplaza todos los spans con la clase `dynamic-field` por su contenido sin etiquetas
@@ -151,22 +160,16 @@ export class CreacionPlantillaComponent implements OnInit {
       span.replaceWith(span.textContent.trim()); // Reemplaza el span por solo su contenido (el `{{campo_dinamico}}`)
     });
 
-    // Obtén el contenido final procesado
-    const finalContent = doc.body.innerHTML;
-
-    // Ahora puedes guardar `finalContent`, que solo tendrá los `{{fieldName}}`
-    console.log('Contenido procesado para guardar:'+finalContent);
-  }
-
-  registrarPlantilla(): void {
-    Swal.fire('registrarPlantilla');
-  }
-
-  setPlantilla(id: string): void {
-    console.log('setPlantilla: ', id);
+    // Obtener el contenido final procesado, que solo tendrá `{{campo_dinamico}}`
+    const contenidoFinal = doc.body.innerHTML;
+    console.log({ contenido: contenidoFinal, campos_dinamicos: this.campos_dinamicos });
   }
 
   generarPdf() {
     console.log('generarPdf');
+  }
+
+  registrarPlantilla(): void {
+    console.log('registrarPlantilla');
   }
 }
