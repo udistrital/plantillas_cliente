@@ -1,11 +1,26 @@
 import { Injectable } from '@angular/core';
 import Swal from 'sweetalert2';
+import { RequestManager } from './requestManager';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UtilService {
-  constructor() {}
+  constructor(private request: RequestManager,) {}
+
+  // Función genérica para hacer solicitudes HTTP GET
+  async fetchData(url: string, endpoint: string): Promise<any> {
+    try {
+      return await new Promise((resolve, reject) => {
+        this.request.get(url, endpoint).subscribe(
+          (data: any) => resolve(data),
+          (error: any) => reject(error)
+        );
+      });
+    } catch (error: any) {
+      throw new Error(`Error al obtener datos de ${url}${endpoint}: ${error.message}`);
+    }
+  }
 
   loading(): void {
     Swal.fire({

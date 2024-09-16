@@ -23,8 +23,8 @@ import { EditorComponent, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
 
 export class CreacionPlantillaComponent implements OnInit {
   plantillaForm: FormGroup;
-  tiposPlantilla: string[] = ['Contrato', 'Acta de inicio', 'Informe', 'Novedad'];
-  sistemas: string[] = ['SISGPLAN', 'SGA', 'POLUX'];
+  tiposPlantilla: any[] = [];
+  sistemas: any[] = [];
   campos_dinamicos: string[] = [];
 
   private subscription: Subscription;
@@ -45,15 +45,14 @@ export class CreacionPlantillaComponent implements OnInit {
   };
 
   constructor(
-    private request: RequestManager,
-    private popUp: UtilService,
+    private utilService: UtilService,
     private userService: UserService,
-    private http: HttpClient,
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private httpClient: HttpClient,
+    private formBuilder: FormBuilder,
+    private activatedRoute: ActivatedRoute,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
-    this.plantillaForm = this.fb.group({
+    this.plantillaForm = this.formBuilder.group({
       nombre: ['', Validators.required],
       tipo: ['', Validators.required],
       sistema: ['', Validators.required],
@@ -63,20 +62,47 @@ export class CreacionPlantillaComponent implements OnInit {
 
   ngOnInit(): void {
     this.subscription = this.plantillaForm.valueChanges.subscribe((value) => {
-      this.cdr.detectChanges();
+      this.changeDetectorRef.detectChanges();
     });
 
-    this.route.params.subscribe((params) => {
+    this.activatedRoute.params.subscribe(async (params) => {
       if (params['id']) {
         this.setPlantilla(params['id']);
       } else {
-        console.log('Creación de plantilla');
+        await this.cargarInformacionInicial();
       }
     });
   }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
+  }
+
+  async cargarInformacionInicial() {
+    Swal.fire({
+      title: 'Cargando información',
+      allowEscapeKey: false,
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+    this.tiposPlantilla = await this.getTiposPlantilla();
+    this.sistemas = await this.getSistemas();
+    console.log(this.sistemas);  
+    Swal.close();
+  }
+
+  // Obtener tipos de Plantilla
+  async getTiposPlantilla() {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    return ['Contrato', 'Acta de inicio', 'Informe', 'Novedad'];
+  }
+
+  // Obtener sistemas
+  async getSistemas() {
+    const sistema = await this.utilService.fetchData(environment.PARAMETROS_SERVICE, `area_tipo?query=Nombre__icontains:Sistema`);
+    return sistema.Data;
   }
 
   cargarImagen(callback: any, value: any, meta: any) {
