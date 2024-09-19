@@ -4,16 +4,12 @@ import { UserService } from '../services/userService';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
-
   //DATA
   roles: any = [];
-  constructor(
-    private userService: UserService
-  ) {
-   }
+  constructor(private userService: UserService) {}
 
   ngOnInit(): void {
     // this.consultarRol();

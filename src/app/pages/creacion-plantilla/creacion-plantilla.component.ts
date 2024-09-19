@@ -1,163 +1,201 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { RequestManager } from '../services/requestManager';
 import { UtilService } from '../services/utilService';
 import { UserService } from '../services/userService';
 import { environment } from '../../../environments/environment';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Seccion } from 'src/app/@core/models/seccion';
+import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { FormSeccionesComponent } from './form-secciones/form-secciones.component';
 import { Plantilla } from 'src/app/@core/models/plantilla';
 import { Respuesta } from 'src/app/@core/models/respuesta';
+import Swal from 'sweetalert2';
+import { Subscription } from 'rxjs';
+import { EditorComponent, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
 
 @Component({
   selector: 'app-creacion-plantilla',
   templateUrl: './creacion-plantilla.component.html',
   styleUrls: ['./creacion-plantilla.component.scss'],
+  providers: [
+    { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' },
+  ],
 })
+
 export class CreacionPlantillaComponent implements OnInit {
   plantillaForm: FormGroup;
+  tiposPlantilla: any[] = [];
+  sistemas: any[] = [];
+  campos_dinamicos: string[] = [];
 
-  seccionesData: Seccion[] = [];
+  private subscription: Subscription;
 
-  ejecutado: boolean = false;
-  tiposPlantilla = [];
-  tipoSeleccionado: string = '';
-
-  @ViewChild(FormSeccionesComponent) seccionesComponent: FormSeccionesComponent;
+  editor: EditorComponent['init'] = {
+    suffix: '.min',
+    base_url: '/tinymce',
+    language_url: '/assets/tinymce/langs/es_MX.js',
+    language: 'es_MX',
+    menubar: false,
+    statusbar: false,
+    plugins: 'autolink charmap directionality emoticons image insertdatetime link lists advlist preview searchreplace table wordcount',
+    toolbar: `undo redo | styles forecolor | bold italic | align numlist bullist | outdent indent | campoDinamico | link image | table tabledelete | tableprops tablerowprops tablecellprops | charmap emoticons | ltr rtl | insertdatetime | searchreplace wordcount | preview`,
+    toolbar_mode: 'sliding',
+    file_picker_types: 'image',
+    // file_picker_callback: this.cargarImagen.bind(this),
+    setup: this.configurarEditor.bind(this)
+  };
 
   constructor(
-    private request: RequestManager,
-    private popUp: UtilService,
+    private utilService: UtilService,
     private userService: UserService,
-    private http: HttpClient,
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private httpClient: HttpClient,
+    private formBuilder: FormBuilder,
+    private activatedRoute: ActivatedRoute,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
-    this.plantillaForm = this.fb.group({
-      nombre: '',
-      tipo: '',
-      descripcion: '',
-      versionActual: 1,
-      secciones: this.fb.array([]),
+    this.plantillaForm = this.formBuilder.group({
+      nombre: ['', Validators.required],
+      tipo: ['', Validators.required],
+      sistema: ['', Validators.required],
+      contenido: ['', Validators.required],
     });
-  }
-
-  get secciones() {
-    return this.plantillaForm.get('secciones') as FormArray;
   }
 
   ngOnInit(): void {
+    this.subscription = this.plantillaForm.valueChanges.subscribe((value) => {
+      this.changeDetectorRef.detectChanges();
+    });
 
-    this.route.params.subscribe((params) => {
+    this.activatedRoute.params.subscribe(async (params) => {
       if (params['id']) {
-        this.llenarCampos(params['id']);
+        this.setPlantilla(params['id']);
       } else {
-        console.log('Creación de plantilla');
+        await this.cargarInformacionInicial();
       }
     });
-
-    this.tiposPlantilla = [
-      { id: 1, Nombre: 'Contrato' },
-      { id: 2, Nombre: '' },
-      { id: 3, Nombre: 'Acta de inicio' },
-      { id: 4, Nombre: 'Informe' },
-    ];
   }
 
-  agregarSecciones(seccionesData: Seccion[]) {
-    this.seccionesData = seccionesData;
-
-    console.log(this.seccionesData);
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
-  agregarSubseccion(index: number) {
-    const nuevaSeccion = this.fb.group({
-      nombre: ['', Validators.required],
-      descripcion: ['', Validators.required],
-      subsecciones: this.fb.array([]),
+  async cargarInformacionInicial() {
+    Swal.fire({
+      title: 'Cargando información',
+      allowEscapeKey: false,
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
     });
-
-    const seccion = this.secciones.at(index) as FormGroup;
-    const subsecciones = seccion.get('subsecciones') as FormArray;
-    subsecciones.push(nuevaSeccion);
+    this.tiposPlantilla = await this.getTiposPlantilla();
+    this.sistemas = await this.getSistemas();
+    console.log(this.sistemas);  
+    Swal.close();
   }
 
-  eliminarSeccion(index: number) {
-    this.secciones.removeAt(index);
+  // Obtener tipos de Plantilla
+  async getTiposPlantilla() {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    return ['Contrato', 'Acta de inicio', 'Informe', 'Novedad'];
   }
 
-  generarPlantilla(): void {
-    console.log('Generando plantilla: ', this.plantillaForm.value);
-    // plantilla enviada desde el componente de secciones
-    const plantillaPost = this.plantillaForm.value;
-    this.postPlantilla(plantillaPost);
+  // Obtener sistemas
+  async getSistemas() {
+    const sistema = await this.utilService.fetchData(environment.PARAMETROS_SERVICE, `area_tipo?query=Nombre__icontains:Sistema`);
+    return sistema.Data;
   }
 
-  postPlantilla(plantillaPost: any) {
-    console.log('Posteando plantilla: ', plantillaPost);
-    try {
-      this.request.post(environment.PLANTILLAS_MID_SERVICE, 'plantilla', plantillaPost).subscribe((res) => {
-        console.log("Respuesta: ", res);
-      });
-    } catch (error) {
-      console.error("Error: ", error);
-    }
-  }
+  cargarImagen(callback: any, value: any, meta: any) {
+    // Crear input para seleccionar archivos
+    const input: any = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
 
-  crearPDF(content: any) {
-    const options = {
-      margin: 10,
-      filename: 'documento.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    // Insertar el archivo en el editor
+    input.onchange = function () {
+      const file = input.files[0];
+      const reader: any = new FileReader();
+      reader.onload = function (e: any) {
+        const base64 = reader.result.toString();
+        callback(base64, { alt: file.name });
+      };
+      reader.readAsDataURL(file);
     };
+    input.click(); // Disparar el input
   }
 
-  llenarCampos(id: string): void {
-    console.log('Llenando campos de plantilla de id: ', id);
-    if (this.ejecutado === false) {
-      try {
-        this.request
-          .get(environment.PLANTILLAS_SERVICE, 'plantilla/' + id)
-          .subscribe((res) => {
-            this.plantillaForm.setControl(
-              'nombre',
-              this.fb.control(res.data[0].nombre)
-            );
-            this.plantillaForm.get('tipo').setValue(res.data[0].tipo);
-            this.plantillaForm.setControl(
-              'descripcion',
-              this.fb.control(res.data[0].descripcion)
-            );
-          });
-      } catch (error) {
-        console.error('Error: ', error);
+  configurarEditor(editor: any) {
+    editor.ui.registry.addButton('campoDinamico', {
+      // text: 'Insertar Campo Dinámico',
+      icon: 'comment-add',
+      tooltip: 'Insertar Campo Dinámico',
+      onAction: () => this.abrirDialogoCampoDinamico(editor)
+    });
+
+    editor.on('input', () => this.actualizarCamposDinamicos(editor.getContent()))
+  }
+
+  abrirDialogoCampoDinamico(editor: any) {
+    editor.windowManager.open({
+      title: 'Agregar campo dinámico',
+      body: {
+        type: 'panel',
+        items: [{ type: 'input', name: 'campo_dinamico', label: 'Nombre del campo' }]
+      },
+      buttons: [
+        { type: 'cancel', text: 'Cancelar' },
+        { type: 'submit', text: 'Guardar', primary: true }
+      ],
+      onSubmit: (api: any) => {
+        const data = api.getData();
+        const content = `<span contenteditable="false" class="dynamic-field" style="display: inline-block; padding: 5px; border: 1px solid #ccc;" data-contenteditable="false">{{${data.campo_dinamico}}}</span>`;
+        editor.insertContent(content);
+        this.campos_dinamicos.push(data.campo_dinamico);
+        api.close();
       }
-    }
-    this.ejecutado = true;
+    });
   }
 
-  actualizarPlantilla(): void {
-    const plantillaPost: any = {};
-    this.request.put(
-      environment.PLANTILLAS_MID_SERVICE, 'plantilla', plantillaPost, '').subscribe({
-        next: (response: Respuesta) => {
-          if (response.Success) {
-            this.popUp.close();
-            if (response.Data == null || (response.Data as any).length === 0) {
-              this.popUp.warning('Ha ocurrido un error al crear la plantilla');
-            } else {
-              this.popUp.success('La plantilla se ha creado correctamente');
-            }
-          }
-        }, error: () => {
-          this.popUp.close();
-          this.popUp.error("No existen peticiones asociadas al coordinador.");
-        }
-      });
+  actualizarCamposDinamicos(content: string): void {
+    // Crear un documento a partir del contenido actual del editor
+    const doc = new DOMParser().parseFromString(content, 'text/html');
+
+    // Obtener los campos dinámicos que todavía están en el contenido del editor
+    const camposActuales: string[] = [];
+    doc.querySelectorAll('span.dynamic-field').forEach(span => {
+      const campoDinamico = span.textContent.trim().replace('{{', '').replace('}}', '');
+      camposActuales.push(campoDinamico);
+    });
+
+    // Filtrar los campos dinámicos eliminados
+    this.campos_dinamicos = this.campos_dinamicos.filter(campo => camposActuales.includes(campo));
+  }
+
+  setPlantilla(id: string): void {
+    console.log('setPlantilla: ', id);
+  }
+
+  guardarPlantilla(): void {
+    const content = this.plantillaForm.value.contenido;
+
+    // Crear un documento a partir del contenido actual del editor
+    const doc = new DOMParser().parseFromString(content, 'text/html');
+
+    // Reemplaza todos los spans con la clase `dynamic-field` por su contenido sin etiquetas
+    doc.querySelectorAll('span.dynamic-field').forEach(span => {
+      span.replaceWith(span.textContent.trim()); // Reemplaza el span por solo su contenido (el `{{campo_dinamico}}`)
+    });
+
+    // Obtener el contenido final procesado, que solo tendrá `{{campo_dinamico}}`
+    const contenidoFinal = doc.body.innerHTML;
+    console.log({ contenido: contenidoFinal, campos_dinamicos: this.campos_dinamicos });
+  }
+
+  generarPdf() {
+    console.log('generarPdf');
+  }
+
+  registrarPlantilla(): void {
+    console.log('registrarPlantilla');
   }
 }

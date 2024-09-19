@@ -16,3 +16,38 @@
         </div>
     </mat-card-content>
 </mat-card>
+<div id="elementoPlantilla">
+    <h1></h1>
+    <p></p>
+    <table>
+        <thead>
+            <tr>
+                <th>Campos</th>
+                <th>Sección</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let seccion of seccionesVista; let i = index" style="margin: 10px;">
+                <td>
+                    <ul>
+                        <li *ngFor="let campo of seccion.campos; let j = index">
+                            <div id="contenidoPlantilla">
+                                <div class="elementClass" *ngIf="campo.dataBinary != ''">
+                                    <img [src]="campo.dataBinary" style="width: 100px; height: 100px;">
+                                </div>
+                                <div style="margin: 10px;" class="elementClass" *ngIf="campo.dataBinary == ''"
+                                    [style.fontSize.px]="campo.tamanoFuente" [style.fontFamily]="campo.estiloFuente"
+                                    [style.fontWeight]="campo.negrita" [style.fontStyle]="campo.cursiva">
+                                    {{ campo.dataString }}
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </td>
+                <td>{{ seccion.nombre }}</td>
+                <td>{{ seccion.descripcion }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

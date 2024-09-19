@@ -1,15 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import { RouteConfigLoadEnd, RouteConfigLoadStart, Router } from '@angular/router';
-import { environment } from 'environments/environment';
+import {
+  RouteConfigLoadEnd,
+  RouteConfigLoadStart,
+  Router,
+} from '@angular/router';
+import { environment } from '../../environments/environment';
 import Swal from 'sweetalert2';
 import { UserService } from './services/userService';
 import { RequestManager } from './services/requestManager';
 @Component({
   selector: 'app-pages',
   template: `<div *ngIf="loaded" class="main-container">
-              <div class="username-info">Bienvenido <br>{{Name}}</div>
-              <router-outlet></router-outlet>
-            </div>`,
+    <div class="username-info">Bienvenido <br />{{ Name }}</div>
+    <router-outlet></router-outlet>
+  </div>`,
 })
 export class PagesComponent implements OnInit {
   loaded = false;
@@ -18,11 +22,10 @@ export class PagesComponent implements OnInit {
   loadingRouter: boolean;
   Name: string = '';
 
-
   constructor(
     private router: Router,
     private userService: UserService,
-    private request: RequestManager,
+    private request: RequestManager
   ) {
     this.environment = environment;
     router.events.subscribe((event) => {
@@ -49,7 +52,7 @@ export class PagesComponent implements OnInit {
   ngOnInit(): void {
     this.loaded = true;
 
-    console.log("Este es el ngOnInit de pages.component.ts");
+    console.log('Este es el ngOnInit de pages.component.ts');
     // this.userService.user$.subscribe((data: any) => {
     //   const hasDocumento = data?.userService?.documento;
     //   if (hasDocumento) {
@@ -60,6 +63,5 @@ export class PagesComponent implements OnInit {
     //       });
     //   }
     // });
-
   }
 }

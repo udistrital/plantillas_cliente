@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { environment } from 'environments/environment';
+import { environment } from '../environments/environment';
 import { Router, NavigationEnd } from '@angular/router';
 import { UserService } from './pages/services/userService';
 declare let gtag: Function;
@@ -14,20 +14,14 @@ export class AppComponent implements OnInit {
   environment = environment;
   loadingRouter: boolean;
   title = 'plantillas-cliente';
-  constructor(
-    private router: Router,
-    private userService: UserService
-  ) {
-    this.router.events.subscribe(event => {
+  constructor(private router: Router, private userService: UserService) {
+    this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        gtag('config', 'G-RBY2GQV40M',
-          {
-            'page_path': event.urlAfterRedirects
-          }
-        );
+        gtag('config', 'G-RBY2GQV40M', {
+          page_path: event.urlAfterRedirects,
+        });
       }
-    }
-    )
+    });
   }
 
   ngOnInit(): void {
@@ -42,7 +36,7 @@ export class AppComponent implements OnInit {
 
     oas.addEventListener('option', (event: any) => {
       if (event.detail) {
-        setTimeout(() => (this.router.navigate([event.detail.Url])), 50);
+        setTimeout(() => this.router.navigate([event.detail.Url]), 50);
       }
     });
 
@@ -51,6 +45,5 @@ export class AppComponent implements OnInit {
         console.log(event.detail);
       }
     });
-
   }
 }

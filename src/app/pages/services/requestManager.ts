@@ -30,12 +30,10 @@ export class RequestManager {
         headers: new HttpHeaders({
           Accept: 'application/json',
           Authorization: `Bearer ${access_token}`,
-        })
-      })
+        }),
+      });
     }
   }
-
-
 
   /**
    * Perform a GET http request
@@ -47,27 +45,25 @@ export class RequestManager {
    */
   get(path, endpoint) {
     return this.header$.pipe(
-      mergeMap(header => {
+      mergeMap((header) => {
         return this.http.get<any>(`${path}${endpoint}`, header).pipe(
-          map(
-            (res: any) => {
-              if (res.hasOwnProperty('Body')) {
-                return res.Body;
-              } else {
-                return res;
-              }
-            },
-          ),
+          map((res: any) => {
+            if (res.hasOwnProperty('Body')) {
+              return res.Body;
+            } else {
+              return res;
+            }
+          }),
           retry(2),
-          catchError(this.errManager.handleError.bind(this)),
+          catchError(this.errManager.handleError.bind(this))
         );
       })
-    )
+    );
   }
 
   /**
    * Perform a POST http request
-   * 
+   *
    * @param path service's path from environment end-point
    * @param endpoint service's end-point
    * @param element data to send as JSON
@@ -75,12 +71,12 @@ export class RequestManager {
    */
   post(path, endpoint, element) {
     return this.header$.pipe(
-      mergeMap(header => {
-        return this.http.post<any>(`${path}${endpoint}`, element, header).pipe(
-          catchError(this.errManager.handleError)
-        )
+      mergeMap((header) => {
+        return this.http
+          .post<any>(`${path}${endpoint}`, element, header)
+          .pipe(catchError(this.errManager.handleError));
       })
-    )
+    );
   }
 
   /**
@@ -93,12 +89,12 @@ export class RequestManager {
    */
   put(path, endpoint, element, id) {
     return this.header$.pipe(
-      mergeMap(header => {
-        return this.http.put<any>(`${path}${endpoint}/${id}`, element, header).pipe(
-          catchError(this.errManager.handleError),
-        );
+      mergeMap((header) => {
+        return this.http
+          .put<any>(`${path}${endpoint}/${id}`, element, header)
+          .pipe(catchError(this.errManager.handleError));
       })
-    )
+    );
   }
 
   /**
@@ -111,11 +107,11 @@ export class RequestManager {
    */
   delete(path, endpoint, id) {
     return this.header$.pipe(
-      mergeMap(header => {
-        return this.http.delete<any>(`${path}${endpoint}/${id}`, header).pipe(
-          catchError(this.errManager.handleError),
-        );
+      mergeMap((header) => {
+        return this.http
+          .delete<any>(`${path}${endpoint}/${id}`, header)
+          .pipe(catchError(this.errManager.handleError));
       })
-    )
+    );
   }
-};
+}

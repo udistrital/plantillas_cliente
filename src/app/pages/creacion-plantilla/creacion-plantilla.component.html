@@ -1,40 +1,38 @@
 <mat-card class="mat-card-margin">
-    <mat-card-title class="plantillas-title">
-        Generar plantillas
-    </mat-card-title>
+    <mat-card-title class="plantillas-title">Generar plantillas</mat-card-title>
+
     <mat-card-content>
         <form [formGroup]="plantillaForm">
-            <div class="form-row" style="border: 1px solid #000;"></div>
-            <br>
-            <div class="panel row">
-                <div class="infoGeneral">
-                    <div style="margin: 20px;">
-                        <mat-form-field *ngIf="plantillaForm">
-                            <mat-label>Nombre de la plantilla</mat-label>
-                            <input matInput formControlName="nombre">
-                        </mat-form-field>
-                    </div>
-                    <div style="margin: 20px;">
-                        <mat-form-field *ngIf="plantillaForm">
-                            <mat-label>Tipo de plantilla</mat-label>
-                            <select matNativeControl formControlName="tipo">
-                                <option *ngFor="let tipo of tiposPlantilla" [value]="tipo.Nombre">{{ tipo.Nombre }}
-                                </option>
-                            </select>
-                        </mat-form-field>
-                    </div>
-                </div>
-                <div style="width: 82%;">
-                    <div class="titulo">
-                        Secciones
-                    </div>
-                    <app-form-secciones (agregarSecciones)="agregarSecciones($event)"></app-form-secciones>
-                </div>
+            <div class="panel">
+                <mat-form-field *ngIf="plantillaForm">
+                    <mat-label>Nombre de la plantilla</mat-label>
+                    <input matInput formControlName="nombre">
+                </mat-form-field>
+                <mat-form-field *ngIf="plantillaForm">
+                    <mat-label>Tipo de plantilla</mat-label>
+                    <mat-select formControlName="tipo">
+                        <mat-option *ngFor="let tipo of tiposPlantilla" [value]="tipo">{{ tipo }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field *ngIf="plantillaForm">
+                    <mat-label>Sistema</mat-label>
+                    <mat-select formControlName="sistema">
+                        <mat-option *ngFor="let sistema of sistemas" [value]="sistema">{{ sistema.Nombre }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <editor [init]="editor" formControlName="contenido"></editor>
             </div>
+
             <div class="row">
-                <button mat-raised-button class="send" type="button" (click)="generarPlantilla()">
-                    Generar
+                <button mat-raised-button type="button" (click)="guardarPlantilla()">
+                    Guardar plantilla
                 </button>
+                <!-- <button mat-raised-button type="button" (click)="generarPdf()" [disabled]="sendDisabled">
+                    Generar pdf
+                </button>
+                <button mat-raised-button type="button" (click)="registrarPlantilla()" [disabled]="sendDisabled">
+                    Registrar plantilla -->
+                <!-- </button> -->
             </div>
         </form>
     </mat-card-content>
